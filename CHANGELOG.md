@@ -15,3 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `RssiSmoothing` enum and `set_rssi_smoothing` method
 - `restart_rx` method
 - `set_rssi_offset` method
+- `set_rssi_collision_threshold`, `set_rssi_threshold` methods

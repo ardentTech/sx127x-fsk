@@ -114,6 +114,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(OP_MODE, byte).await
     }
 
+    /// Sets the received signal strength indicator (RSSI) collision threshold.
+    ///
+    /// Seee: datasheet section 2.1.7.3
+    pub async fn set_rssi_collision_threshold(&mut self, db: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RSSI_COLLISION, db).await
+    }
+
     /// Sets the received signal strength indicator (RSSI) offset.
     ///
     /// See: datasheet section 3.5.4
@@ -133,6 +140,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(RSSI_CONFIG).await?;
         set_bits(&mut byte, smoothing as u8, RSSI_CONFIG_RSSI_SMOOTHING_MASK, 0);
         self.spi.write(RSSI_CONFIG, byte).await
+    }
+
+    /// Sets the received signal strength indicator (RSSI) trigger level for the Rssi interrupt.
+    ///
+    /// Seee: datasheet section 2.1.3.9
+    pub async fn set_rssi_threshold(&mut self, control: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RSSI_THRESH, control).await
     }
 
     /// Sets the receiver config.
