@@ -13,3 +13,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fdev`, `set_fdev` methods
 - `set_frequency`, `set_rx_config` methods
 - `RssiSmoothing` enum and `set_rssi_smoothing` method
+- `restart_rx` method

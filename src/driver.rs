@@ -40,6 +40,19 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(FSTEP * ((msb as u16) << 8 | lsb as u16) as f32)
     }
 
+    /// Triggers a manual restart of the receiver chain.
+    ///
+    /// See: datasheet section 2.1.5.6
+    pub async fn restart_rx(&mut self, with_pll_lock: bool) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(RX_CONFIG).await?;
+        if with_pll_lock {
+            set_bits(&mut byte, 1, RX_CONFIG_RESTART_WITH_PLL_LOCK_MASK, 5);
+        } else {
+            set_bits(&mut byte, 1, RX_CONFIG_RESTART_WITHOUT_PLL_LOCK_MASK, 6);
+        }
+        self.spi.write(RX_CONFIG, byte).await
+    }
+
     /// Sets the bandwidth for the channel filter.
     ///
     /// See: datasheet section 3.5.6
