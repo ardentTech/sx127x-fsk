@@ -107,3 +107,15 @@ impl Default for RxConfig {
     }
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum RssiSmoothing {
+    Samples2 = 0x0,
+    Samples4 = 0x1,
+    #[default]
+    Samples8 = 0x2,
+    Samples16 = 0x3,
+    Samples32 = 0x4,
+    Samples64 = 0x5,
+    Samples128 = 0x6,
+    Samples256 = 0x7,
+}

@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::calculate;
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, RxConfig};
+use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, RssiSmoothing, RxConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -101,7 +101,18 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(OP_MODE, byte).await
     }
 
+    /// Sets the received signal strength indicator (RSSI) smoothing.
+    ///
+    /// See: datasheet section 3.5.4
+    pub async fn set_rssi_smoothing(&mut self, smoothing: RssiSmoothing) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(RSSI_CONFIG).await?;
+        set_bits(&mut byte, smoothing as u8, RSSI_CONFIG_RSSI_SMOOTHING_MASK, 0);
+        self.spi.write(RSSI_CONFIG, byte).await
+    }
+
     /// Sets the receiver config.
+    ///
+    /// See: datasheet page 96
     pub async fn set_rx_config(&mut self, config: RxConfig) -> Result<(), Sx127xError<SPI::Error>> {
         let mut byte = self.spi.read(RX_CONFIG).await?;
         set_bits(&mut byte, config.afc_auto_on as u8, RX_CONFIG_AFC_AUTO_ON_MASK, 4);
