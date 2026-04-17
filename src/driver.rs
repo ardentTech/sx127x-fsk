@@ -3,7 +3,7 @@ use sx127x_common::bits::{set_bits, unset_bits};
 use sx127x_common::error::Sx127xError;
 use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
-use crate::calculate;
+use crate::{calculate, validate};
 use crate::registers::*;
 use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, RssiSmoothing, RxConfig};
 
@@ -86,11 +86,11 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     /// Sets the frequency deviation (fdev).
     ///
     /// See: datasheet section 2.1.2.1
-    pub async fn set_fdev(&mut self, fdev_hz: u32) -> Result<(), Sx127xError<SPI::Error>> {
-        if fdev_hz < 600 || fdev_hz > 200_000 {
-            return Err(Sx127xError::InvalidFdev)
+    pub async fn set_fdev(&mut self, hz: u32) -> Result<(), Sx127xError<SPI::Error>> {
+        if !validate::fdev(hz) {
+            return Err(Sx127xError::InvalidInput)
         }
-        let fdev = (fdev_hz as f32 / FSTEP) as u16;
+        let fdev = (hz as f32 / FSTEP) as u16;
         self.spi.write(FDEV_MSB, (fdev >> 8) as u8).await?;
         self.spi.write(FDEV_LSB, fdev as u8).await
     }
@@ -112,6 +112,18 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(OP_MODE).await?;
         set_bits(&mut byte, modulation_type as u8, OP_MODE_MODULATION_TYPE_MASK, 5);
         self.spi.write(OP_MODE, byte).await
+    }
+
+    /// Sets the received signal strength indicator (RSSI) offset.
+    ///
+    /// See: datasheet section 3.5.4
+    pub async fn set_rssi_offset(&mut self, offset: i8) -> Result<(), Sx127xError<SPI::Error>> {
+        if !validate::rssi_offset(offset) {
+            return Err(Sx127xError::InvalidInput)
+        }
+        let mut byte = self.spi.read(RSSI_CONFIG).await?;
+        set_bits(&mut byte, offset as u8, RSSI_CONFIG_RSSI_OFFSET_MASK, 3);
+        self.spi.write(RSSI_CONFIG, byte).await
     }
 
     /// Sets the received signal strength indicator (RSSI) smoothing.
