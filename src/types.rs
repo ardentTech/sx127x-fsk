@@ -87,3 +87,23 @@ pub enum ModulationType {
     FSK = 0x00,
     OOK = 0x01
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RxConfig {
+    pub afc_auto_on: bool,
+    pub agc_auto_on: bool,
+    pub restart_rx_on_collision: bool,
+    pub rx_trigger: u8
+}
+
+impl Default for RxConfig {
+    fn default() -> Self {
+        Self {
+            afc_auto_on: false,
+            agc_auto_on: true,
+            restart_rx_on_collision: false,
+            rx_trigger: 0x06
+        }
+    }
+}
+

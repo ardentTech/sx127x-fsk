@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::calculate;
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType};
+use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, RxConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -18,17 +18,6 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         driver.set_fsk_mode().await?;
 
         Ok(driver)
-    }
-
-    /// Sets the bandwidth for the channel filter.
-    ///
-    /// See: datasheet section 3.5.6
-    pub async fn set_bandwidth(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
-        let mut byte = self.spi.read(RX_BW).await?;
-        let bw = BwConfig::from(bandwidth);
-        set_bits(&mut byte, bw.exp, RX_BW_EXP_MASK, 0);
-        set_bits(&mut byte, bw.mant, RX_BW_MANT_MASK, 3);
-        Ok(())
     }
 
     /// Gets the bit rate in b/s.
@@ -51,10 +40,21 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(FSTEP * ((msb as u16) << 8 | lsb as u16) as f32)
     }
 
+    /// Sets the bandwidth for the channel filter.
+    ///
+    /// See: datasheet section 3.5.6
+    pub async fn set_bandwidth(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(RX_BW).await?;
+        let bw = BwConfig::from(bandwidth);
+        set_bits(&mut byte, bw.exp, RX_BW_EXP_MASK, 0);
+        set_bits(&mut byte, bw.mant, RX_BW_MANT_MASK, 3);
+        Ok(())
+    }
+
     /// Sets the bit rate.
     ///
     /// See: datasheet section 2.1.1
-    pub async fn set_bite_rate(&mut self, rate: u16, frac: u8) -> Result<(), Sx127xError<SPI::Error>> {
+    pub async fn set_bit_rate(&mut self, rate: u16, frac: u8) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(BITRATE_MSB, (rate >> 8) as u8).await?;
         self.spi.write(BITRATE_LSB, rate as u8).await?;
         self.spi.write(BITRATE_FRAC, frac).await
@@ -82,11 +82,33 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(FDEV_LSB, fdev as u8).await
     }
 
+    /// Sets the carrier frequency.
+    ///
+    /// See: datasheet Table 32
+    pub async fn set_frequency(&mut self, hz: u32) -> Result<(), Sx127xError<SPI::Error>> {
+        // TODO SX1279 has more range
+        // TODO getter
+        let frf = sx127x_common::calculate::frf(hz, FSTEP);
+        self.spi.write(FRF_MSB, (frf >> 16) as u8).await?;
+        self.spi.write(FRF_MID, (frf >> 8) as u8).await?;
+        self.spi.write(FRF_LSB, frf as u8).await
+    }
+
     /// Sets the modulation type.
     pub async fn set_modulation_type(&mut self, modulation_type: ModulationType) -> Result<(), Sx127xError<SPI::Error>> {
         let mut byte = self.spi.read(OP_MODE).await?;
         set_bits(&mut byte, modulation_type as u8, OP_MODE_MODULATION_TYPE_MASK, 5);
         self.spi.write(OP_MODE, byte).await
+    }
+
+    /// Sets the receiver config.
+    pub async fn set_rx_config(&mut self, config: RxConfig) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(RX_CONFIG).await?;
+        set_bits(&mut byte, config.afc_auto_on as u8, RX_CONFIG_AFC_AUTO_ON_MASK, 4);
+        set_bits(&mut byte, config.agc_auto_on as u8, RX_CONFIG_AGC_AUTO_ON_MASK, 3);
+        set_bits(&mut byte, config.restart_rx_on_collision as u8, RX_CONFIG_RESTART_RX_ON_COLLISION_MASK, 7);
+        set_bits(&mut byte, config.rx_trigger, RX_CONFIG_RX_TRIGGER_MASK, 0);
+        self.spi.write(RX_CONFIG, byte).await
     }
 
     // PRIVATE -------------------------------------------------------------------------------------

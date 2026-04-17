@@ -11,3 +11,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_bandwidth`, `set_device_mode` methods
 - `bit_rate`, `set_bit_rate` methods
 - `fdev`, `set_fdev` methods
+- `set_frequency`, `set_rx_config` methods
