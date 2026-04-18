@@ -32,11 +32,17 @@ pub const RSSI_CONFIG_RSSI_SMOOTHING_MASK: u8 = 0x07;
 // -------------------------------------------------------------------------------------------------
 pub const RSSI_COLLISION: u8 = 0x0f;
 pub const RSSI_THRESH: u8 = 0x10;
+pub const RSSI_VALUE: u8 = 0x11;
 
 // RegRxBw -----------------------------------------------------------------------------------------
 pub const RX_BW: u8 = 0x12;
 pub const RX_BW_EXP_MASK: u8 = 0x07;
 pub const RX_BW_MANT_MASK: u8 = 0x18;
+
+// RegAfcBw -----------------------------------------------------------------------------------------
+pub const AFC_BW: u8 = 0x13;
+pub const AFC_BW_EXP_MASK: u8 = 0x07;
+pub const AFC_BW_MANT_MASK: u8 = 0x18;
 
 // -------------------------------------------------------------------------------------------------
 pub const BITRATE_FRAC: u8 = 0x5d;

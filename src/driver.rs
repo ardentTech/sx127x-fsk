@@ -53,15 +53,33 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(RX_CONFIG, byte).await
     }
 
+    /// Gets the absolute value of the received signal strength indicator (RSSI) in dBm, 0.5dB steps.
+    ///
+    /// See: datasheet section 3.5.4
+    pub async fn rssi(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(RSSI_VALUE).await
+    }
+
+    /// Sets the bandwidth for automatic frequency correction (AFC).
+    ///
+    /// See: datasheet section 2.1.3.5
+    pub async fn set_afc_bw(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(AFC_BW).await?;
+        let bw = BwConfig::from(bandwidth);
+        set_bits(&mut byte, bw.exp, AFC_BW_EXP_MASK, 0);
+        set_bits(&mut byte, bw.mant, AFC_BW_MANT_MASK, 3);
+        self.spi.write(AFC_BW, byte).await
+    }
+
     /// Sets the bandwidth for the channel filter.
     ///
     /// See: datasheet section 3.5.6
-    pub async fn set_bandwidth(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
+    pub async fn set_rx_bw(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
         let mut byte = self.spi.read(RX_BW).await?;
         let bw = BwConfig::from(bandwidth);
         set_bits(&mut byte, bw.exp, RX_BW_EXP_MASK, 0);
         set_bits(&mut byte, bw.mant, RX_BW_MANT_MASK, 3);
-        Ok(())
+        self.spi.write(RX_BW, byte).await
     }
 
     /// Sets the bit rate.

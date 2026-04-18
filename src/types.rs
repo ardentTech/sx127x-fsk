@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Bandwidth {
     Bw2_6kHz,
     Bw3_1kHz,
@@ -6,7 +6,6 @@ pub enum Bandwidth {
     Bw5_2kHz,
     Bw6_3kHz,
     Bw7_8kHz,
-    #[default]
     Bw10_4kHz,
     Bw12_5kHz,
     Bw15_6kHz,
@@ -33,6 +32,7 @@ impl BwConfig {
 }
 
 impl From<Bandwidth> for BwConfig {
+    /// See: datasheet table 40
     fn from(value: Bandwidth) -> Self {
         match value {
             Bandwidth::Bw2_6kHz => BwConfig::new(7, 2),
