@@ -24,7 +24,7 @@ pub const RX_CONFIG_AFC_AUTO_ON_MASK: u8 = 0x10;
 pub const RX_CONFIG_AGC_AUTO_ON_MASK: u8 = 0x08;
 pub const RX_CONFIG_RX_TRIGGER_MASK: u8 = 0x07;
 
-// RegRssiConfig -------------------------------------------------------------------------------------
+// RegRssiConfig -----------------------------------------------------------------------------------
 pub const RSSI_CONFIG: u8 = 0x0e;
 pub const RSSI_CONFIG_RSSI_OFFSET_MASK: u8 = 0xf8;
 pub const RSSI_CONFIG_RSSI_SMOOTHING_MASK: u8 = 0x07;
@@ -39,13 +39,18 @@ pub const RX_BW: u8 = 0x12;
 pub const RX_BW_EXP_MASK: u8 = 0x07;
 pub const RX_BW_MANT_MASK: u8 = 0x18;
 
-// RegAfcBw -----------------------------------------------------------------------------------------
+// RegAfcBw ----------------------------------------------------------------------------------------
 pub const AFC_BW: u8 = 0x13;
 pub const AFC_BW_EXP_MASK: u8 = 0x07;
 pub const AFC_BW_MANT_MASK: u8 = 0x18;
 
+// RegOokPeak --------------------------------------------------------------------------------------
+pub const OOK_PEAK: u8 = 0x14;
+pub const OOK_PEAK_BIT_SYNC_ON_MASK: u8 = 0x20;
+pub const OOK_PEAK_OOK_THRESH_TYPE_MASK: u8 = 0x18;
+pub const OOK_PEAK_OOK_PEAK_THRESH_STEP_MASK: u8 = 0x07;
+
 // -------------------------------------------------------------------------------------------------
-// TODO pub const OOK_PEAK: u8 = 0x14;
 pub const OOK_FIX: u8 = 0x15;
 // TODO pub const OOK_AVG: u8 = 0x16;
 // TODO pub const AFC_FEI: u8 = 0x1a;

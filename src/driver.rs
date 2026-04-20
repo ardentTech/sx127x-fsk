@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, RssiSmoothing, RxConfig};
+use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, OokPeakConfig, RssiSmoothing, RxConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -119,6 +119,17 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(OP_MODE).await?;
         set_bits(&mut byte, modulation_type as u8, OP_MODE_MODULATION_TYPE_MASK, 5);
         self.spi.write(OP_MODE, byte).await
+    }
+
+    /// Sets the OOK peak configuration.
+    ///
+    /// See: datasheet section 2.1.3.2
+    pub async fn set_ook_peak_config(&mut self, config: OokPeakConfig) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(OOK_PEAK).await?;
+        set_bits(&mut byte, config.bit_sync_on as u8, OOK_PEAK_BIT_SYNC_ON_MASK, 5);
+        set_bits(&mut byte, config.ook_thresh_type as u8, OOK_PEAK_OOK_THRESH_TYPE_MASK, 3);
+        set_bits(&mut byte, config.ook_peak_thresh as u8, OOK_PEAK_OOK_PEAK_THRESH_STEP_MASK, 0);
+        self.spi.write(OOK_PEAK, byte).await
     }
 
     /// Sets the fixed threshold for the Data Slicer in OOK mode, or the floor threshold for the Data Slicer in OOK when Peak mode is used.

@@ -60,6 +60,7 @@ impl From<Bandwidth> for BwConfig {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum DeviceMode {
     SLEEP = 0x0,
@@ -82,12 +83,51 @@ impl From<u8> for DeviceMode {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ModulationType {
     FSK = 0x00,
     OOK = 0x01
 }
 
+// -------------------------------------------------------------------------------------------------
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum OokThreshType {
+    FixedThreshold = 0x0,
+    #[default]
+    PeakMode = 0x1,
+    AverageMode = 0x2
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum OokPeakThreshStep {
+    #[default]
+    Step0_5dB,
+    Step1_0dB,
+    Step1_5dB,
+    Step2_0dB,
+    Step3_0dB,
+    Step4_0dB,
+    Step5_0dB,
+    Step6_0dB,
+}
+
+pub struct OokPeakConfig {
+    pub bit_sync_on: bool,
+    pub ook_thresh_type: OokThreshType,
+    pub ook_peak_thresh: OokPeakThreshStep
+}
+impl Default for OokPeakConfig {
+    fn default() -> Self {
+        Self {
+            bit_sync_on: true,
+            ook_thresh_type: OokThreshType::default(),
+            ook_peak_thresh: OokPeakThreshStep::default()
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct RxConfig {
     pub afc_auto_on: bool,
@@ -107,6 +147,7 @@ impl Default for RxConfig {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum RssiSmoothing {
     Samples2 = 0x0,
