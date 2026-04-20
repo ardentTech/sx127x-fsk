@@ -45,4 +45,20 @@ pub const AFC_BW_EXP_MASK: u8 = 0x07;
 pub const AFC_BW_MANT_MASK: u8 = 0x18;
 
 // -------------------------------------------------------------------------------------------------
+// TODO pub const OOK_PEAK: u8 = 0x14;
+pub const OOK_FIX: u8 = 0x15;
+// TODO pub const OOK_AVG: u8 = 0x16;
+// TODO pub const AFC_FEI: u8 = 0x1a;
+// TODO pub const AFC_MSB: u8 = 0x1b;
+// TODO pub const AFC_LSB: u8 = 0x1c;
+// TODO pub const FEI_MSB: u8 = 0x1d;
+// TODO pub const FEI_LSB: u8 = 0x1e;
+// TODO pub const PREAMBLE_DETECT: u8 = 0x1f;
+// TODO pub const RX_TIMEOUT1: u8 = 0x20;
+// TODO pub const RX_TIMEOUT2: u8 = 0x21;
+// TODO pub const RX_TIMEOUT3: u8 = 0x22;
+pub const RX_DELAY: u8 = 0x23;
+// TODO pub const OSC: u8 = 0x24;
+// TODO pub const PREAMBLE_MSB: u8 = 0x25;
+// TODO pub const PREAMBLE_LSB: u8 = 0x26;
 pub const BITRATE_FRAC: u8 = 0x5d;

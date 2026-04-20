@@ -71,17 +71,6 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(AFC_BW, byte).await
     }
 
-    /// Sets the bandwidth for the channel filter.
-    ///
-    /// See: datasheet section 3.5.6
-    pub async fn set_rx_bw(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
-        let mut byte = self.spi.read(RX_BW).await?;
-        let bw = BwConfig::from(bandwidth);
-        set_bits(&mut byte, bw.exp, RX_BW_EXP_MASK, 0);
-        set_bits(&mut byte, bw.mant, RX_BW_MANT_MASK, 3);
-        self.spi.write(RX_BW, byte).await
-    }
-
     /// Sets the bit rate.
     ///
     /// See: datasheet section 2.1.1
@@ -132,6 +121,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(OP_MODE, byte).await
     }
 
+    /// Sets the fixed threshold for the Data Slicer in OOK mode, or the floor threshold for the Data Slicer in OOK when Peak mode is used.
+    ///
+    /// See: datasheet section 2.1.3.2
+    pub async fn set_ook_threshold(&mut self, threshold: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(OOK_FIX, threshold).await
+    }
+
     /// Sets the received signal strength indicator (RSSI) collision threshold.
     ///
     /// Seee: datasheet section 2.1.7.3
@@ -167,6 +163,17 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(RSSI_THRESH, control).await
     }
 
+    /// Sets the bandwidth for the channel filter.
+    ///
+    /// See: datasheet section 3.5.6
+    pub async fn set_rx_bw(&mut self, bandwidth: Bandwidth) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(RX_BW).await?;
+        let bw = BwConfig::from(bandwidth);
+        set_bits(&mut byte, bw.exp, RX_BW_EXP_MASK, 0);
+        set_bits(&mut byte, bw.mant, RX_BW_MANT_MASK, 3);
+        self.spi.write(RX_BW, byte).await
+    }
+
     /// Sets the receiver config.
     ///
     /// See: datasheet page 96
@@ -177,6 +184,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         set_bits(&mut byte, config.restart_rx_on_collision as u8, RX_CONFIG_RESTART_RX_ON_COLLISION_MASK, 7);
         set_bits(&mut byte, config.rx_trigger, RX_CONFIG_RX_TRIGGER_MASK, 0);
         self.spi.write(RX_CONFIG, byte).await
+    }
+
+    /// Sets an additional delay before an automatic receiver restart is launched.
+    ///
+    /// See: datasheet section 2.1.7.2
+    pub async fn set_inter_packet_rx_delay(&mut self, delay: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RX_DELAY, delay).await
     }
 
     // PRIVATE -------------------------------------------------------------------------------------
