@@ -19,3 +19,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_afc_bw` method
 - `set_inter_packet_rx_delay`, `set_ook_threshold` methods
 - `set_ook_peak_config` method
+- `set_ook_avg` method

@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, OokPeakConfig, RssiSmoothing, RxConfig};
+use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, OokAvg, OokPeakConfig, RssiSmoothing, RxConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -119,6 +119,17 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(OP_MODE).await?;
         set_bits(&mut byte, modulation_type as u8, OP_MODE_MODULATION_TYPE_MASK, 5);
         self.spi.write(OP_MODE, byte).await
+    }
+
+    /// Sets the average of the OOK demod config.
+    ///
+    /// See: datasheet section 2.1.3.2
+    pub async fn set_ook_avg(&mut self, config: OokAvg) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(OOK_AVG).await?;
+        set_bits(&mut byte, config.ook_peak_thresh_dec as u8, OOK_AVG_OOK_PEAK_THRESH_DEC_MASK, 5);
+        set_bits(&mut byte, config.ook_average_offset as u8, OOK_AVG_OOK_AVERAGE_OFFSET, 2);
+        set_bits(&mut byte, config.ook_average_thresh_filt as u8, OOK_AVG_OOK_AVERAGE_THRESH_FILT, 0);
+        self.spi.write(OOK_AVG, byte).await
     }
 
     /// Sets the OOK peak configuration.

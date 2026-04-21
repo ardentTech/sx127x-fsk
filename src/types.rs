@@ -91,6 +91,43 @@ pub enum ModulationType {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum OokPeakThreshDec {
+    #[default]
+    OncePerChip = 0x0,
+    OnceEveryTwoChips = 0x1,
+    OnceEveryFourChips = 0x2,
+    OnceEveryEightChips = 0x3,
+    TwiceInEachChip = 0x4,
+    FourTimesInEachChip = 0x5,
+    EightTimesInEachChip = 0x6,
+    SixteenTimesInEachChips = 0x7,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum OokAverageOffset {
+    #[default]
+    Offset0dB = 0x0,
+    Offset2dB = 0x1,
+    Offset4dB = 0x2,
+    Offset6dB = 0x3,
+}
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum OokAverageThreshFilt {
+    Divisor32xPi = 0x0,
+    Divisor8xPi = 0x1,
+    #[default]
+    Divisor4xPi = 0x2,
+    Divisor2xPi = 0x3,
+}
+pub struct OokAvg {
+    pub ook_peak_thresh_dec: OokPeakThreshDec,
+    pub ook_average_offset: OokAverageOffset,
+    pub ook_average_thresh_filt: OokAverageThreshFilt
+}
+
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum OokThreshType {
     FixedThreshold = 0x0,
