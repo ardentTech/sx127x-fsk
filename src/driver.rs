@@ -60,7 +60,15 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.read(RSSI_VALUE).await
     }
 
-    /// Sets the AFC auto-clear. Only valid if AfcAutoOn bit of RegRxConfig is set.
+    /// Sets the automatic frequency correction (AFC) value.
+    ///
+    /// See: datasheet section 2.1.3.5
+    pub async fn set_afc(&mut self, afc: i16) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(AFC_MSB, (afc >> 8) as u8).await?;
+        self.spi.write(AFC_LSB, (afc & 0xff) as u8).await
+    }
+
+    /// Sets the automatic frequency correction (AFC) auto-clear. Only valid if AfcAutoOn bit of RegRxConfig is set.
     ///
     /// See: datasheet section 2.1.3.5
     pub async fn set_afc_auto_clear(&mut self, on: bool) -> Result<(), Sx127xError<SPI::Error>> {

@@ -21,3 +21,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_ook_peak_config` method
 - `set_ook_avg` method
 - `set_afc_auto_clear`, `start_agc_sequence` methods
+- `set_afc` method
