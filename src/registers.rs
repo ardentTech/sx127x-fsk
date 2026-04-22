@@ -75,7 +75,14 @@ pub const FEI_LSB: u8 = 0x1e;
 // TODO pub const RX_TIMEOUT_2: u8 = 0x21;
 // TODO pub const RX_TIMEOUT_3: u8 = 0x22;
 pub const RX_DELAY: u8 = 0x23;
-// TODO pub const OSC: u8 = 0x24;
+
+// RegOsc ------------------------------------------------------------------------------------------
+pub const OSC: u8 = 0x24;
+pub const OSC_RC_CAL_START_MASK: u8 = 0x08;
+pub const OSC_CLK_OUT_MASK: u8 = 0x07;
+
+// -------------------------------------------------------------------------------------------------
+
 // TODO pub const PREAMBLE_MSB: u8 = 0x25;
 // TODO pub const PREAMBLE_LSB: u8 = 0x26;
 // TODO pub const SYNC_CONFIG: u8 = 0x27;

@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, DeviceMode, ModulationType, OokAvg, OokPeakConfig, RssiSmoothing, RxConfig};
+use crate::types::{Bandwidth, BwConfig, ClkOut, DeviceMode, ModulationType, OokAvg, OokPeakConfig, RssiSmoothing, RxConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -29,6 +29,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let frac = self.spi.read(BITRATE_FRAC).await?;
 
         Ok(calculate::bit_rate(FXOSC_HZ as f32, ((msb as u16) << 8 | lsb as u16) as f32, frac as f32))
+    }
+
+    /// Trigger calibration of the RC oscillator.
+    pub async fn calibrate_rc_oscillator(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        let byte = self.spi.read(OSC).await?;
+        self.set_device_mode(DeviceMode::STDBY).await?;
+        self.spi.write(OSC, byte | OSC_RC_CAL_START_MASK).await
     }
 
     /// Gets the frequency deviation (fdev) in Hz.
@@ -104,6 +111,15 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(BITRATE_MSB, (rate >> 8) as u8).await?;
         self.spi.write(BITRATE_LSB, rate as u8).await?;
         self.spi.write(BITRATE_FRAC, frac).await
+    }
+
+    /// Sets the CLKOUT frequency.
+    ///
+    /// See: datasheet section 2.1.11
+    pub async fn set_clk_out(&mut self, clk_out: ClkOut) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(OSC).await?;
+        set_bits(&mut byte, clk_out as u8, OSC_CLK_OUT_MASK, 0);
+        self.spi.write(OSC, byte).await
     }
 
     /// Sets the device mode.

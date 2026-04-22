@@ -61,6 +61,20 @@ impl From<Bandwidth> for BwConfig {
 }
 
 // -------------------------------------------------------------------------------------------------
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum ClkOut {
+    Fxosc = 0x0,
+    FxoscDiv2 = 0x1,
+    FxoscDiv4 = 0x2,
+    FxoscDiv8 = 0x3,
+    FxoscDiv16 = 0x4,
+    FxoscDiv32 = 0x5,
+    RC = 0x6,
+    #[default]
+    Off = 0x7
+}
+
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum DeviceMode {
     SLEEP = 0x0,

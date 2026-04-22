@@ -23,3 +23,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_afc_auto_clear`, `start_agc_sequence` methods
 - `set_afc` method
 - `fei`, `set_fei` methods
+- `set_clk_out`, `calibrate_rc_oscillator` methods
