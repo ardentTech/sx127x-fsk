@@ -40,6 +40,15 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(FSTEP * ((msb as u16) << 8 | lsb as u16) as f32)
     }
 
+    /// Gets the frequency error indication (FEI).
+    ///
+    /// See: datasheet section 2.1.3.4
+    pub async fn fei(&mut self) -> Result<i16, Sx127xError<SPI::Error>> {
+        let msb = self.spi.read(FEI_MSB).await?;
+        let lsb = self.spi.read(FEI_LSB).await?;
+        Ok(((msb as u16) << 8 | lsb as u16) as i16)
+    }
+
     /// Triggers a manual restart of the receiver chain.
     ///
     /// See: datasheet section 2.1.5.6
@@ -117,6 +126,14 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let fdev = (hz as f32 / FSTEP) as u16;
         self.spi.write(FDEV_MSB, (fdev >> 8) as u8).await?;
         self.spi.write(FDEV_LSB, fdev as u8).await
+    }
+
+    /// Sets the frequency error indication (FEI).
+    ///
+    /// See: datasheet section 2.1.3.4
+    pub async fn set_fei(&mut self, fei: i16) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(FEI_MSB, (fei >> 8) as u8).await?;
+        self.spi.write(FEI_LSB, (fei & 0xff) as u8).await
     }
 
     /// Sets the carrier frequency.

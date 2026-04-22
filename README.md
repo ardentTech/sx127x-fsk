@@ -15,6 +15,7 @@ TODO
 ### TODO
 - [ ] rename `sx127x-fsk` to `sx127x-fskook`?
 - [ ] LowFrequencyModeOn bit of RegOpMode
+- [ ] AFC getter
 
 ### Resources
 * [Datasheet](https://semtech.my.salesforce.com/sfc/p/E0000000JelG/a/2R0000001Rbr/6EfVZUorrpoKFfvaF_Fkpgp5kzjiNyiAbqcpqh9qSjE)

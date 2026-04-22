@@ -68,8 +68,8 @@ pub const AFC_FEI_AFC_AUTO_CLEAR_ON_MASK: u8 = 0x01;
 // -------------------------------------------------------------------------------------------------
 pub const AFC_MSB: u8 = 0x1b;
 pub const AFC_LSB: u8 = 0x1c;
-// TODO pub const FEI_MSB: u8 = 0x1d;
-// TODO pub const FEI_LSB: u8 = 0x1e;
+pub const FEI_MSB: u8 = 0x1d;
+pub const FEI_LSB: u8 = 0x1e;
 // TODO pub const PREAMBLE_DETECT: u8 = 0x1f;
 // TODO pub const RX_TIMEOUT_1: u8 = 0x20;
 // TODO pub const RX_TIMEOUT_2: u8 = 0x21;
