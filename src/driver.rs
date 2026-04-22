@@ -56,6 +56,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(((msb as u16) << 8 | lsb as u16) as i16)
     }
 
+    /// Gets the preamble size to be sent.
+    pub async fn preamble_size(&mut self) -> Result<u16, Sx127xError<SPI::Error>> {
+        let msb = self.spi.read(PREAMBLE_MSB).await?;
+        let lsb = self.spi.read(PREAMBLE_LSB).await?;
+        Ok((msb as u16) << 8 | lsb as u16)
+    }
+
     /// Triggers a manual restart of the receiver chain.
     ///
     /// See: datasheet section 2.1.5.6
@@ -198,6 +205,12 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     /// See: datasheet section 2.1.3.2
     pub async fn set_ook_threshold(&mut self, threshold: u8) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(OOK_FIX, threshold).await
+    }
+
+    /// Sets the preamble size to be sent.
+    pub async fn set_preamble_size(&mut self, size: u16) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(PREAMBLE_MSB, (size >> 8) as u8).await?;
+        self.spi.write(PREAMBLE_LSB, (size & 0xff) as u8).await
     }
 
     /// Sets the received signal strength indicator (RSSI) collision threshold.

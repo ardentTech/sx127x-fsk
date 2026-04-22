@@ -82,9 +82,10 @@ pub const OSC_RC_CAL_START_MASK: u8 = 0x08;
 pub const OSC_CLK_OUT_MASK: u8 = 0x07;
 
 // -------------------------------------------------------------------------------------------------
+pub const PREAMBLE_MSB: u8 = 0x25;
+pub const PREAMBLE_LSB: u8 = 0x26;
 
-// TODO pub const PREAMBLE_MSB: u8 = 0x25;
-// TODO pub const PREAMBLE_LSB: u8 = 0x26;
+// -------------------------------------------------------------------------------------------------
 // TODO pub const SYNC_CONFIG: u8 = 0x27;
 // TODO pub const SYNC_VALUE_1: u8 = 0x28;
 // TODO pub const SYNC_VALUE_2: u8 = 0x29;
