@@ -60,6 +60,15 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.read(RSSI_VALUE).await
     }
 
+    /// Sets the AFC auto-clear. Only valid if AfcAutoOn bit of RegRxConfig is set.
+    ///
+    /// See: datasheet section 2.1.3.5
+    pub async fn set_afc_auto_clear(&mut self, on: bool) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(AFC_FEI).await?;
+        set_bits(&mut byte, on as u8, AFC_FEI_AFC_AUTO_CLEAR_ON_MASK, 0);
+        self.spi.write(AFC_FEI, byte).await
+    }
+
     /// Sets the bandwidth for automatic frequency correction (AFC).
     ///
     /// See: datasheet section 2.1.3.5
@@ -213,6 +222,14 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     /// See: datasheet section 2.1.7.2
     pub async fn set_inter_packet_rx_delay(&mut self, delay: u8) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(RX_DELAY, delay).await
+    }
+
+    /// Triggers an AGC sequence.
+    ///
+    /// See: datasheet section 2.1.3.5
+    pub async fn start_agc_sequence(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        let byte = self.spi.read(AFC_FEI).await?;
+        self.spi.write(AFC_FEI, byte | AFC_FEI_AGC_START_MASK).await
     }
 
     // PRIVATE -------------------------------------------------------------------------------------
