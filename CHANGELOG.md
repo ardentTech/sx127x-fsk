@@ -25,3 +25,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fei`, `set_fei` methods
 - `set_clk_out`, `calibrate_rc_oscillator` methods
 - `set_preamble_size`, `preamble_size` methods
+- `set_sync_config` method

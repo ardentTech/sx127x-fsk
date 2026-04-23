@@ -85,6 +85,13 @@ pub const OSC_CLK_OUT_MASK: u8 = 0x07;
 pub const PREAMBLE_MSB: u8 = 0x25;
 pub const PREAMBLE_LSB: u8 = 0x26;
 
+// RegSyncConfig -----------------------------------------------------------------------------------
+pub const SYNC_CONFIG: u8 = 0x27;
+pub const SYNC_CONFIG_AUTO_RESTART_RX_MODE_MASK: u8 = 0xc0;
+pub const SYNC_CONFIG_PREAMBLE_POLARITY_MASK: u8 = 0x20;
+pub const SYNC_CONFIG_SYNC_ON_MASK: u8 = 0x10;
+pub const SYNC_CONFIG_SYNC_SIZE_MASK: u8 = 0x07;
+
 // -------------------------------------------------------------------------------------------------
 // TODO pub const SYNC_CONFIG: u8 = 0x27;
 // TODO pub const SYNC_VALUE_1: u8 = 0x28;

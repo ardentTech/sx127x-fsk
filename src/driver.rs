@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, ClkOut, DeviceMode, ModulationType, OokAvg, OokPeakConfig, RssiSmoothing, RxConfig};
+use crate::types::{Bandwidth, BwConfig, ClkOut, DeviceMode, ModulationType, OokAvg, OokPeakConfig, RssiSmoothing, RxConfig, SyncConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -171,6 +171,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(FRF_LSB, frf as u8).await
     }
 
+    /// Sets an additional delay before an automatic receiver restart is launched.
+    ///
+    /// See: datasheet section 2.1.7.2
+    pub async fn set_inter_packet_rx_delay(&mut self, delay: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RX_DELAY, delay).await
+    }
+
     /// Sets the modulation type.
     pub async fn set_modulation_type(&mut self, modulation_type: ModulationType) -> Result<(), Sx127xError<SPI::Error>> {
         let mut byte = self.spi.read(OP_MODE).await?;
@@ -271,11 +278,20 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(RX_CONFIG, byte).await
     }
 
-    /// Sets an additional delay before an automatic receiver restart is launched.
+    /// Set sync word recognition configuration.
     ///
-    /// See: datasheet section 2.1.7.2
-    pub async fn set_inter_packet_rx_delay(&mut self, delay: u8) -> Result<(), Sx127xError<SPI::Error>> {
-        self.spi.write(RX_DELAY, delay).await
+    /// See: datasheet section 2.1.7.2, 2.1.10.1, 2.1.13.6
+    pub async fn set_sync_config(&mut self, config: SyncConfig) -> Result<(), Sx127xError<SPI::Error>> {
+        // TODO put this on config struct
+        if !validate::sync_size(config.sync_size) {
+            return Err(Sx127xError::InvalidInput)
+        }
+        let mut byte = self.spi.read(SYNC_CONFIG).await?;
+        set_bits(&mut byte, config.auto_restart_rx_mode as u8, SYNC_CONFIG_AUTO_RESTART_RX_MODE_MASK, 6);
+        set_bits(&mut byte, config.preamble_polarity as u8, SYNC_CONFIG_PREAMBLE_POLARITY_MASK, 5);
+        set_bits(&mut byte, config.sync_on as u8, SYNC_CONFIG_SYNC_ON_MASK, 4);
+        set_bits(&mut byte, config.sync_size, SYNC_CONFIG_SYNC_SIZE_MASK, 0);
+        self.spi.write(SYNC_CONFIG, byte).await
     }
 
     /// Triggers an AGC sequence.

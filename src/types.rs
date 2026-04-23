@@ -1,3 +1,11 @@
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum AutoRestartRxMode {
+    Off = 0x0,
+    On = 0x1,
+    #[default]
+    OnWaitForPllLock = 0x2,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Bandwidth {
     Bw2_6kHz,
@@ -210,4 +218,23 @@ pub enum RssiSmoothing {
     Samples64 = 0x5,
     Samples128 = 0x6,
     Samples256 = 0x7,
+}
+
+// -------------------------------------------------------------------------------------------------
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SyncConfig {
+    pub auto_restart_rx_mode: AutoRestartRxMode,
+    pub preamble_polarity: bool,
+    pub sync_on: bool,
+    pub sync_size: u8
+}
+impl Default for SyncConfig {
+    fn default() -> Self {
+        Self {
+            auto_restart_rx_mode: Default::default(),
+            preamble_polarity: false,
+            sync_on: true,
+            sync_size: 0x3,
+        }
+    }
 }
