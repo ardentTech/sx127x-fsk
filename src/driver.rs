@@ -278,11 +278,11 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(RX_CONFIG, byte).await
     }
 
-    /// Set sync word recognition configuration.
+    /// Sets the sync word recognition configuration.
     ///
     /// See: datasheet section 2.1.7.2, 2.1.10.1, 2.1.13.6
     pub async fn set_sync_config(&mut self, config: SyncConfig) -> Result<(), Sx127xError<SPI::Error>> {
-        // TODO put this on config struct
+        // TODO put this on config struct?
         if !validate::sync_size(config.sync_size) {
             return Err(Sx127xError::InvalidInput)
         }
@@ -292,6 +292,18 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         set_bits(&mut byte, config.sync_on as u8, SYNC_CONFIG_SYNC_ON_MASK, 4);
         set_bits(&mut byte, config.sync_size, SYNC_CONFIG_SYNC_SIZE_MASK, 0);
         self.spi.write(SYNC_CONFIG, byte).await
+    }
+
+    /// Sets the sync word values. `values[0]` == RegSyncValue1 (MSB byte) ... `values[7]` == RegSyncValue8.
+    /// Since "SyncValue choices containing 0x00 bytes are not allowed", if 0x00 bytes in `values` will be
+    /// converted to 0x01, which is the default register value.
+    ///
+    /// See: datasheet section 2.1.10.1
+    pub async fn set_sync_values(&mut self, values: &[u8; 8]) -> Result<(), Sx127xError<SPI::Error>> {
+        for (i, n) in values.iter().enumerate() {
+            self.spi.write(SYNC_VALUE_1 + i as u8, if *n == 0 { 0x1 } else { *n }).await?;
+        }
+        Ok(())
     }
 
     /// Triggers an AGC sequence.

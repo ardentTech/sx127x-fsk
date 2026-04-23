@@ -93,15 +93,15 @@ pub const SYNC_CONFIG_SYNC_ON_MASK: u8 = 0x10;
 pub const SYNC_CONFIG_SYNC_SIZE_MASK: u8 = 0x07;
 
 // -------------------------------------------------------------------------------------------------
-// TODO pub const SYNC_CONFIG: u8 = 0x27;
-// TODO pub const SYNC_VALUE_1: u8 = 0x28;
-// TODO pub const SYNC_VALUE_2: u8 = 0x29;
-// TODO pub const SYNC_VALUE_3: u8 = 0x2a;
-// TODO pub const SYNC_VALUE_4: u8 = 0x2b;
-// TODO pub const SYNC_VALUE_5: u8 = 0x2c;
-// TODO pub const SYNC_VALUE_6: u8 = 0x2d;
-// TODO pub const SYNC_VALUE_7: u8 = 0x2e;
-// TODO pub const SYNC_VALUE_8: u8 = 0x2f;
+pub const SYNC_VALUE_1: u8 = 0x28;
+pub const SYNC_VALUE_2: u8 = 0x29;
+pub const SYNC_VALUE_3: u8 = 0x2a;
+pub const SYNC_VALUE_4: u8 = 0x2b;
+pub const SYNC_VALUE_5: u8 = 0x2c;
+pub const SYNC_VALUE_6: u8 = 0x2d;
+pub const SYNC_VALUE_7: u8 = 0x2e;
+pub const SYNC_VALUE_8: u8 = 0x2f;
+
 // TODO pub const PACKET_CONFIG_1: u8 = 0x30;
 // TODO pub const PACKET_CONFIG_2: u8 = 0x31;
 // TODO pub const PAYLOAD_LENGTH: u8 = 0x32;
