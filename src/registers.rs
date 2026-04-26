@@ -94,15 +94,17 @@ pub const SYNC_CONFIG_SYNC_SIZE_MASK: u8 = 0x07;
 
 // -------------------------------------------------------------------------------------------------
 pub const SYNC_VALUE_1: u8 = 0x28;
-pub const SYNC_VALUE_2: u8 = 0x29;
-pub const SYNC_VALUE_3: u8 = 0x2a;
-pub const SYNC_VALUE_4: u8 = 0x2b;
-pub const SYNC_VALUE_5: u8 = 0x2c;
-pub const SYNC_VALUE_6: u8 = 0x2d;
-pub const SYNC_VALUE_7: u8 = 0x2e;
-pub const SYNC_VALUE_8: u8 = 0x2f;
 
-// TODO pub const PACKET_CONFIG_1: u8 = 0x30;
+// RegPacketConfig1 --------------------------------------------------------------------------------
+pub const PACKET_CONFIG_1: u8 = 0x30;
+pub const PACKET_CONFIG_1_PACKET_FORMAT_MASK: u8 = 0x80;
+pub const PACKET_CONFIG_1_DC_FREE_MASK: u8 = 0x60;
+pub const PACKET_CONFIG_1_CRC_ON_MASK: u8 = 0x10;
+pub const PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK: u8 = 0x08;
+pub const PACKET_CONFIG_1_ADDRESS_FILTERING_MASK: u8 = 0x06;
+pub const PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK: u8 = 0x01;
+
+// RegPacketConfig2 --------------------------------------------------------------------------------
 // TODO pub const PACKET_CONFIG_2: u8 = 0x31;
 // TODO pub const PAYLOAD_LENGTH: u8 = 0x32;
 // TODO pub const NODE_ADRS: u8 = 0x33;

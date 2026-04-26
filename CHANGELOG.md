@@ -27,3 +27,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_preamble_size`, `preamble_size` methods
 - `set_sync_config` method
 - `set_sync_values` method
+- `packet_config1`, `set_packet_config1` methods

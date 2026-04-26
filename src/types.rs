@@ -187,6 +187,96 @@ impl Default for OokPeakConfig {
 }
 
 // -------------------------------------------------------------------------------------------------
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum AddressFiltering {
+    #[default]
+    None = 0x0,
+    MatchNodeAddress = 0x1,
+    MatchNodeOrBroadcastAddress = 0x2,
+}
+
+impl From<u8> for AddressFiltering {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => AddressFiltering::MatchNodeAddress,
+            0x2 => AddressFiltering::MatchNodeOrBroadcastAddress,
+            _ => AddressFiltering::None
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum CrcWhiteningType {
+    #[default]
+    CcittStandard = 0x0,
+    IbmAlternate = 0x1,
+}
+
+impl From<u8> for CrcWhiteningType {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => CrcWhiteningType::IbmAlternate,
+            _ => CrcWhiteningType::CcittStandard
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum DcFree {
+    #[default]
+    None = 0x0,
+    Manchester = 0x1,
+    Whitening = 0x2,
+}
+
+impl From<u8> for DcFree {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => DcFree::Manchester,
+            0x2 => DcFree::Whitening,
+            _ => DcFree::None,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum PacketFormat {
+    FixedLength = 0x0,
+    #[default]
+    VariableLength = 0x1,
+}
+impl From<u8> for PacketFormat {
+    fn from(value: u8) -> Self {
+        match value {
+            0x0 => PacketFormat::FixedLength,
+            _ => PacketFormat::VariableLength
+        }
+    }
+}
+
+pub struct PacketConfig1 {
+    pub address_filtering: AddressFiltering,
+    pub crc_auto_clear_off: bool,
+    pub crc_on: bool,
+    pub crc_whitening_type: CrcWhiteningType,
+    pub dc_free: DcFree,
+    pub packet_format: PacketFormat,
+}
+
+impl Default for PacketConfig1 {
+    fn default() -> Self {
+        Self {
+            address_filtering: AddressFiltering::default(),
+            crc_auto_clear_off: false,
+            crc_on: true,
+            crc_whitening_type: CrcWhiteningType::default(),
+            dc_free: DcFree::default(),
+            packet_format: PacketFormat::default()
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct RxConfig {
     pub afc_auto_on: bool,

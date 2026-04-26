@@ -1,11 +1,11 @@
 use embedded_hal_async::spi::SpiDevice;
-use sx127x_common::bits::{set_bits, unset_bits};
+use sx127x_common::bits::{get_bits, set_bits, unset_bits};
 use sx127x_common::error::Sx127xError;
 use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{Bandwidth, BwConfig, ClkOut, DeviceMode, ModulationType, OokAvg, OokPeakConfig, RssiSmoothing, RxConfig, SyncConfig};
+use crate::types::{AddressFiltering, Bandwidth, BwConfig, ClkOut, CrcWhiteningType, DcFree, DeviceMode, ModulationType, OokAvg, OokPeakConfig, PacketConfig1, PacketFormat, RssiSmoothing, RxConfig, SyncConfig};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -54,6 +54,21 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let msb = self.spi.read(FEI_MSB).await?;
         let lsb = self.spi.read(FEI_LSB).await?;
         Ok(((msb as u16) << 8 | lsb as u16) as i16)
+    }
+
+    /// Gets packet mode settings.
+    ///
+    /// See: datasheet sections 2.1.13.2, 2.1.13.4, 2.1.13.6, 2.1.13.7
+    pub async fn packet_config1(&mut self) -> Result<PacketConfig1, Sx127xError<SPI::Error>> {
+        let byte = self.spi.read(PACKET_CONFIG_1).await?;
+        Ok(PacketConfig1 {
+            address_filtering: AddressFiltering::from(get_bits(byte, PACKET_CONFIG_1_ADDRESS_FILTERING_MASK, 1)),
+            crc_auto_clear_off: get_bits(byte, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3) == 0,
+            crc_on: get_bits(byte, PACKET_CONFIG_1_CRC_ON_MASK, 1) == 1,
+            crc_whitening_type: CrcWhiteningType::from(get_bits(byte, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0)),
+            dc_free: DcFree::from(get_bits(byte, PACKET_CONFIG_1_DC_FREE_MASK, 5)),
+            packet_format: PacketFormat::from(get_bits(byte, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7)),
+        })
     }
 
     /// Gets the preamble size to be sent.
@@ -214,6 +229,21 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(OOK_FIX, threshold).await
     }
 
+    /// Sets packet mode settings.
+    ///
+    /// See: datasheet sections 2.1.13.2, 2.1.13.4, 2.1.13.6, 2.1.13.7
+    pub async fn set_packet_config1(&mut self, config: PacketConfig1) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = 0u8;
+        // TODO break all of these out into individual methods?
+        set_bits(&mut byte, config.packet_format as u8, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7);
+        set_bits(&mut byte, config.dc_free as u8, PACKET_CONFIG_1_DC_FREE_MASK, 5);
+        set_bits(&mut byte, config.crc_on as u8, PACKET_CONFIG_1_CRC_ON_MASK, 4);
+        set_bits(&mut byte, config.crc_auto_clear_off as u8, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3);
+        set_bits(&mut byte, config.address_filtering as u8, PACKET_CONFIG_1_ADDRESS_FILTERING_MASK, 1);
+        set_bits(&mut byte, config.crc_whitening_type as u8, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0);
+        self.spi.write(PACKET_CONFIG_1, byte).await
+    }
+
     /// Sets the preamble size to be sent.
     pub async fn set_preamble_size(&mut self, size: u16) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(PREAMBLE_MSB, (size >> 8) as u8).await?;
@@ -280,7 +310,7 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
 
     /// Sets the sync word recognition configuration.
     ///
-    /// See: datasheet section 2.1.7.2, 2.1.10.1, 2.1.13.6
+    /// See: datasheet sections 2.1.7.2, 2.1.10.1, 2.1.13.6
     pub async fn set_sync_config(&mut self, config: SyncConfig) -> Result<(), Sx127xError<SPI::Error>> {
         // TODO put this on config struct?
         if !validate::sync_size(config.sync_size) {
