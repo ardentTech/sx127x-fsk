@@ -56,7 +56,7 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(((msb as u16) << 8 | lsb as u16) as i16)
     }
 
-    /// Gets packet mode settings.
+    /// Gets the packet mode settings.
     ///
     /// See: datasheet sections 2.1.13.2, 2.1.13.4, 2.1.13.6, 2.1.13.7
     pub async fn packet_config1(&mut self) -> Result<PacketConfig1, Sx127xError<SPI::Error>> {
@@ -69,6 +69,14 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
             dc_free: DcFree::from(get_bits(byte, PACKET_CONFIG_1_DC_FREE_MASK, 5)),
             packet_format: PacketFormat::from(get_bits(byte, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7)),
         })
+    }
+
+    /// Gets the payload length.
+    ///
+    /// See: datasheet section 2.1.13.2
+    pub async fn payload_length(&mut self) -> Result<u16, Sx127xError<SPI::Error>> {
+        let packet_config_2 = self.spi.read(PACKET_CONFIG_2).await?;
+        Ok((get_bits(packet_config_2, PACKET_CONFIG_2_PAYLOAD_LENGTH, 0) as u16) << 8 | self.spi.read(PAYLOAD_LENGTH).await? as u16)
     }
 
     /// Gets the preamble size to be sent.
@@ -103,7 +111,7 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     /// See: datasheet section 2.1.3.5
     pub async fn set_afc(&mut self, afc: i16) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(AFC_MSB, (afc >> 8) as u8).await?;
-        self.spi.write(AFC_LSB, (afc & 0xff) as u8).await
+        self.spi.write(AFC_LSB, afc as u8).await
     }
 
     /// Sets the automatic frequency correction (AFC) auto-clear. Only valid if AfcAutoOn bit of RegRxConfig is set.
@@ -171,7 +179,7 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     /// See: datasheet section 2.1.3.4
     pub async fn set_fei(&mut self, fei: i16) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(FEI_MSB, (fei >> 8) as u8).await?;
-        self.spi.write(FEI_LSB, (fei & 0xff) as u8).await
+        self.spi.write(FEI_LSB, fei as u8).await
     }
 
     /// Sets the carrier frequency.
@@ -244,10 +252,20 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(PACKET_CONFIG_1, byte).await
     }
 
+    /// Sets the payload length.
+    ///
+    /// See: datasheet section 2.1.13.2
+    pub async fn set_payload_length(&mut self, length: u16) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut packet_config_2 = self.spi.read(PACKET_CONFIG_2).await?;
+        set_bits(&mut packet_config_2, (length >> 8) as u8, PACKET_CONFIG_2_PAYLOAD_LENGTH, 0);
+        self.spi.write(PACKET_CONFIG_2, packet_config_2).await?;
+        self.spi.write(PAYLOAD_LENGTH, length as u8).await
+    }
+
     /// Sets the preamble size to be sent.
     pub async fn set_preamble_size(&mut self, size: u16) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(PREAMBLE_MSB, (size >> 8) as u8).await?;
-        self.spi.write(PREAMBLE_LSB, (size & 0xff) as u8).await
+        self.spi.write(PREAMBLE_LSB, size as u8).await
     }
 
     /// Sets the received signal strength indicator (RSSI) collision threshold.

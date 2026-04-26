@@ -105,8 +105,12 @@ pub const PACKET_CONFIG_1_ADDRESS_FILTERING_MASK: u8 = 0x06;
 pub const PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK: u8 = 0x01;
 
 // RegPacketConfig2 --------------------------------------------------------------------------------
-// TODO pub const PACKET_CONFIG_2: u8 = 0x31;
-// TODO pub const PAYLOAD_LENGTH: u8 = 0x32;
+pub const PACKET_CONFIG_2: u8 = 0x31;
+// TODO 
+pub const PACKET_CONFIG_2_PAYLOAD_LENGTH: u8 = 0x07;
+
+// -------------------------------------------------------------------------------------------------
+pub const PAYLOAD_LENGTH: u8 = 0x32;
 // TODO pub const NODE_ADRS: u8 = 0x33;
 // TODO pub const BROADCAST_ADRS: u8 = 0x34;
 // TODO pub const FIFO_THRESH: u8 = 0x35;

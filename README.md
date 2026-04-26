@@ -19,10 +19,11 @@
 
 ### TODO
 
-- [ ] rename `sx127x-fsk` to `sx127x-fskook`?
 - [ ] LowFrequencyModeOn bit of RegOpMode
 - [ ] AFC getter
 - [ ] errata
+- [ ] review all setters for assoc getter (check against datasheet r/rw)
+- [ ] reduce stack allocs in methods
 
 ### Resources
 
