@@ -56,6 +56,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(((msb as u16) << 8 | lsb as u16) as i16)
     }
 
+    /// Gets the node address used in address filtering.
+    ///
+    /// See: datasheet section 2.1.13.6
+    pub async fn node_addr(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(NODE_ADRS).await
+    }
+
     /// Gets the packet mode settings.
     ///
     /// See: datasheet sections 2.1.13.2, 2.1.13.4, 2.1.13.6, 2.1.13.7
@@ -206,6 +213,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(OP_MODE).await?;
         set_bits(&mut byte, modulation_type as u8, OP_MODE_MODULATION_TYPE_MASK, 5);
         self.spi.write(OP_MODE, byte).await
+    }
+
+    /// Sets the node address used in address filtering.
+    ///
+    /// See: datasheet section 2.1.13.6
+    pub async fn set_node_addr(&mut self, addr: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(NODE_ADRS, addr).await
     }
 
     /// Sets the average of the OOK demod config.

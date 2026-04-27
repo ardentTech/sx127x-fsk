@@ -29,3 +29,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_sync_values` method
 - `packet_config1`, `set_packet_config1` methods
 - `payload_length`, `set_payload_length` methods
+- `node_addr`, `set_node_addr` methods
