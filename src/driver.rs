@@ -31,6 +31,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(calculate::bit_rate(FXOSC_HZ as f32, ((msb as u16) << 8 | lsb as u16) as f32, frac as f32))
     }
 
+    /// Gets the broadcast address used in address filtering.
+    ///
+    /// See: datasheet section 2.1.13.6
+    pub async fn broadcast_addr(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(BROADCAST_ADRS).await
+    }
+
     /// Trigger calibration of the RC oscillator.
     pub async fn calibrate_rc_oscillator(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
         let byte = self.spi.read(OSC).await?;
@@ -148,6 +155,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(BITRATE_MSB, (rate >> 8) as u8).await?;
         self.spi.write(BITRATE_LSB, rate as u8).await?;
         self.spi.write(BITRATE_FRAC, frac).await
+    }
+
+    /// Sets the broadcast address used in address filtering.
+    ///
+    /// See: datasheet section 2.1.13.6
+    pub async fn set_broadcast_addr(&mut self, addr: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(BROADCAST_ADRS, addr).await
     }
 
     /// Sets the CLKOUT frequency.
