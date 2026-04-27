@@ -1,3 +1,6 @@
+use sx127x_common::error::Sx127xError;
+use crate::validate;
+
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum AutoRestartRxMode {
     Off = 0x0,
@@ -238,6 +241,31 @@ impl From<u8> for DcFree {
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum TxStartCondition {
+    FifoBytesExceedsThreshold = 0x0,
+    #[default]
+    FifoNotEmpty = 0x1,
+}
+impl From<u8> for TxStartCondition {
+    fn from(value: u8) -> Self {
+        match value {
+            0x0 => TxStartCondition::FifoBytesExceedsThreshold,
+            _ => TxStartCondition::FifoNotEmpty,
+        }
+    }
+}
+
+pub struct FifoThreshold(pub(crate) u8);
+impl FifoThreshold {
+    pub fn new(value: u8) -> Result<Self, Sx127xError<()>> {
+        if !validate::fifo_threshold(value) { Err(Sx127xError::InvalidInput) } else { Ok(Self(value)) }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum PacketFormat {

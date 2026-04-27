@@ -113,7 +113,13 @@ pub const PACKET_CONFIG_2_PAYLOAD_LENGTH: u8 = 0x07;
 pub const PAYLOAD_LENGTH: u8 = 0x32;
 pub const NODE_ADRS: u8 = 0x33;
 pub const BROADCAST_ADRS: u8 = 0x34;
-// TODO pub const FIFO_THRESH: u8 = 0x35;
+
+// RegFifoThresh -----------------------------------------------------------------------------------
+pub const FIFO_THRESH: u8 = 0x35;
+pub const FIFO_THRESH_TX_START_CONDITION_MASK: u8 = 0x80;
+pub const FIFO_THRESH_FIFO_THRESHOLD_MASK: u8 = 0x3f;
+
+// -------------------------------------------------------------------------------------------------
 // TODO pub const SEQ_CONFIG_1: u8 = 0x36;
 // TODO pub const SEQ_CONFIG_2: u8 = 0x37;
 // TODO pub const TIMER_RESOL: u8 = 0x38;

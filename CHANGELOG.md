@@ -31,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `payload_length`, `set_payload_length` methods
 - `node_addr`, `set_node_addr` methods
 - `broadcast_addr`, `set_broadcast_addr` methods
+- `fifo_threshold`, `set_fifo_threshold`, `tx_start_condition`, `set_tx_start_condition` methods

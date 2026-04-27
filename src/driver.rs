@@ -5,7 +5,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{AddressFiltering, Bandwidth, BwConfig, ClkOut, CrcWhiteningType, DcFree, DeviceMode, ModulationType, OokAvg, OokPeakConfig, PacketConfig1, PacketFormat, RssiSmoothing, RxConfig, SyncConfig};
+use crate::types::{AddressFiltering, Bandwidth, BwConfig, ClkOut, CrcWhiteningType, DcFree, DeviceMode, FifoThreshold, ModulationType, OokAvg, OokPeakConfig, PacketConfig1, PacketFormat, RssiSmoothing, RxConfig, SyncConfig, TxStartCondition};
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
@@ -61,6 +61,13 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         let msb = self.spi.read(FEI_MSB).await?;
         let lsb = self.spi.read(FEI_LSB).await?;
         Ok(((msb as u16) << 8 | lsb as u16) as i16)
+    }
+
+    /// Gets the FIFO threshold used to trigger the FifoLevel interrupt.
+    ///
+    /// See: datasheet section 2.1.10
+    pub async fn fifo_threshold(&mut self) -> Result<FifoThreshold, Sx127xError<SPI::Error>> {
+        Ok(FifoThreshold(get_bits(self.spi.read(FIFO_THRESH).await?, FIFO_THRESH_FIFO_THRESHOLD_MASK, 0)))
     }
 
     /// Gets the node address used in address filtering.
@@ -201,6 +208,15 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     pub async fn set_fei(&mut self, fei: i16) -> Result<(), Sx127xError<SPI::Error>> {
         self.spi.write(FEI_MSB, (fei >> 8) as u8).await?;
         self.spi.write(FEI_LSB, fei as u8).await
+    }
+
+    /// Sets the FIFO threshold used to trigger the FifoLevel interrupt.
+    ///
+    /// See: datasheet section 2.1.10
+    pub async fn set_fifo_threshold(&mut self, threshold: FifoThreshold) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(FIFO_THRESH).await?;
+        set_bits(&mut byte, threshold.0, FIFO_THRESH_FIFO_THRESHOLD_MASK, 0);
+        self.spi.write(FIFO_THRESH, byte).await
     }
 
     /// Sets the carrier frequency.
@@ -382,6 +398,15 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(())
     }
 
+    /// Sets the condition to start packet transmission.
+    ///
+    /// See: datasheet section 2.1.13.3
+    pub async fn set_tx_start_condition(&mut self, condition: TxStartCondition) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(FIFO_THRESH).await?;
+        set_bits(&mut byte, condition as u8, FIFO_THRESH_TX_START_CONDITION_MASK, 7);
+        self.spi.write(FIFO_THRESH_TX_START_CONDITION_MASK, byte).await
+    }
+
     /// Triggers an AGC sequence.
     ///
     /// See: datasheet section 2.1.3.5
@@ -390,11 +415,17 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(AFC_FEI, byte | AFC_FEI_AGC_START_MASK).await
     }
 
+    /// Gets the condition to start packet transmission.
+    ///
+    /// See: datasheet section 2.1.13.3
+    pub async fn tx_start_condition(&mut self) -> Result<TxStartCondition, Sx127xError<SPI::Error>> {
+        Ok(TxStartCondition::from(get_bits(self.spi.read(FIFO_THRESH).await?, FIFO_THRESH_TX_START_CONDITION_MASK, 7)))
+    }
+
     // PRIVATE -------------------------------------------------------------------------------------
 
     // Selects the LoRa modem when `on` == true, and the FSK/OOK modem when `on` == false.
     async fn set_fsk_mode(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
-        // TODO true? : also clears the FIFO buffer
         self.set_device_mode(DeviceMode::SLEEP).await?;
 
         let mut op_mode = self.spi.read(OP_MODE).await?;

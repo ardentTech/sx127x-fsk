@@ -1,11 +1,16 @@
 const FDEV_MIN_HZ: u16 = 600;
 const FDEV_MAX_HZ: u32 = 200_000;
+const FIFO_THRESHOLD_MAX: u8 = 63;
 const RSSI_OFFSET_MIN: i8 = -16;
 const RSSI_OFFSET_MAX: i8 = 15;
 const SYNC_SIZE_MAX: u8 = 7;
 
 pub(crate) fn fdev(hz: u32) -> bool {
     hz >= FDEV_MIN_HZ as u32 && hz <= FDEV_MAX_HZ
+}
+
+pub(crate) fn fifo_threshold(threshold: u8) -> bool {
+    threshold <= FIFO_THRESHOLD_MAX
 }
 
 pub(crate) fn rssi_offset(offset: i8) -> bool {
@@ -33,6 +38,16 @@ mod tests {
     #[test]
     fn fdev_ok() {
         assert!(fdev(FDEV_MAX_HZ - 1));
+    }
+
+    #[test]
+    fn fifo_threshold_high() {
+        assert!(!fifo_threshold(FIFO_THRESHOLD_MAX + 1));
+    }
+
+    #[test]
+    fn fifo_threshold_ok() {
+        assert!(fifo_threshold(FIFO_THRESHOLD_MAX - 1));
     }
 
     #[test]
