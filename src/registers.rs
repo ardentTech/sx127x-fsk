@@ -106,7 +106,7 @@ pub const PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK: u8 = 0x01;
 
 // RegPacketConfig2 --------------------------------------------------------------------------------
 pub const PACKET_CONFIG_2: u8 = 0x31;
-// TODO
+// TODO masks
 pub const PACKET_CONFIG_2_PAYLOAD_LENGTH: u8 = 0x07;
 
 // -------------------------------------------------------------------------------------------------
@@ -123,8 +123,8 @@ pub const FIFO_THRESH_FIFO_THRESHOLD_MASK: u8 = 0x3f;
 // TODO pub const SEQ_CONFIG_1: u8 = 0x36;
 // TODO pub const SEQ_CONFIG_2: u8 = 0x37;
 // TODO pub const TIMER_RESOL: u8 = 0x38;
-// TODO pub const TIMER_1_COEFF: u8 = 0x39;
-// TODO pub const TIMER_2_COEFF: u8 = 0x3a;
+pub const TIMER_1_COEFF: u8 = 0x39;
+pub const TIMER_2_COEFF: u8 = 0x3a;
 // TODO pub const IMAGE_CAL: u8 = 0x3b;
 // TODO pub const TEMP: u8 = 0x3c;
 // TODO pub const LOW_BAT: u8 = 0x3d;

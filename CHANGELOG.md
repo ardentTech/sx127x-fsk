@@ -32,3 +32,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `node_addr`, `set_node_addr` methods
 - `broadcast_addr`, `set_broadcast_addr` methods
 - `fifo_threshold`, `set_fifo_threshold`, `tx_start_condition`, `set_tx_start_condition` methods
+- `timer1_coefficient`, `set_timer1_coefficient`, `timer2_coefficient`, `set_timer2_coefficient` methods

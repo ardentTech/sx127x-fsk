@@ -5,13 +5,13 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::registers::*;
-use crate::types::{AddressFiltering, Bandwidth, BwConfig, ClkOut, CrcWhiteningType, DcFree, DeviceMode, FifoThreshold, ModulationType, OokAvg, OokPeakConfig, PacketConfig1, PacketFormat, RssiSmoothing, RxConfig, SyncConfig, TxStartCondition};
+use crate::types::*;
 
 /// Sx127x driver with FSK modem.
 pub struct Sx127xFsk<SPI> {
     pub spi: Sx127xSpi<SPI>
 }
-impl <SPI: SpiDevice> Sx127xFsk<SPI> {
+impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     pub async fn new(spi: SPI) -> Result<Self, Sx127xError<SPI::Error>> {
         let mut driver = Self { spi: Sx127xSpi::new(spi) };
 
@@ -398,6 +398,20 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(())
     }
 
+    /// Sets the coefficient for Timer1.
+    ///
+    /// See: datasheet section 2.1.8.3
+    pub async fn set_timer1_coefficient(&mut self, coefficient: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(TIMER_1_COEFF, coefficient).await
+    }
+
+    /// Sets the coefficient for Timer2.
+    ///
+    /// See: datasheet section 2.1.8.3
+    pub async fn set_timer2_coefficient(&mut self, coefficient: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(TIMER_2_COEFF, coefficient).await
+    }
+
     /// Sets the condition to start packet transmission.
     ///
     /// See: datasheet section 2.1.13.3
@@ -413,6 +427,20 @@ impl <SPI: SpiDevice> Sx127xFsk<SPI> {
     pub async fn start_agc_sequence(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
         let byte = self.spi.read(AFC_FEI).await?;
         self.spi.write(AFC_FEI, byte | AFC_FEI_AGC_START_MASK).await
+    }
+
+    /// Sets the coefficient for Timer1.
+    ///
+    /// See: datasheet section 2.1.8.3
+    pub async fn timer1_coefficient(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(TIMER_1_COEFF).await
+    }
+
+    /// Sets the coefficient for Timer2.
+    ///
+    /// See: datasheet section 2.1.8.3
+    pub async fn timer2_coefficient(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(TIMER_2_COEFF).await
     }
 
     /// Gets the condition to start packet transmission.
