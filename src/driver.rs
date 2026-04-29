@@ -417,6 +417,15 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(())
     }
 
+    /// Sets the temperature change threshold to trigger a new I/Q calibration.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn set_temp_threshold(&mut self, temp_threshold: TempThreshold) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(IMAGE_CAL).await?;
+        set_bits(&mut byte, temp_threshold as u8, IMAGE_CAL_TEMP_THRESHOLD_MASK, 1);
+        self.spi.write(IMAGE_CAL, byte).await
+    }
+
     /// Sets the coefficient for Timer1.
     ///
     /// See: datasheet section 2.1.8.3
@@ -448,11 +457,36 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(AFC_FEI, byte | AFC_FEI_AGC_START_MASK).await
     }
 
+    /// Triggers the IQ and RSSI calibration when set in Standby mode.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn start_image_calibration(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_device_mode(DeviceMode::STDBY).await?;
+        let mut byte = self.spi.read(IMAGE_CAL).await?;
+        set_bits(&mut byte, 1, IMAGE_CAL_IMAGE_CAL_START_MASK, 6);
+        self.spi.write(IMAGE_CAL, byte).await
+    }
+
     /// Gets the temperature measurement.
     ///
     /// See: datasheet section 3.5.7
     pub async fn temp(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
         self.spi.read(TEMP).await
+    }
+
+    /// Gets the IRQ flag witnessing a temperature change exceeding TempThreshold since the last Image and RSSI calibration.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn temp_change_greater_than_threshold(&mut self) -> Result<bool, Sx127xError<SPI::Error>> {
+        let byte = self.spi.read(IMAGE_CAL).await?;
+        Ok(get_bits(byte, IMAGE_CAL_TEMP_CHANGE_MASK, 3) == 1)
+    }
+
+    /// Gets the temperature change threshold to trigger a new I/Q calibration.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn temp_threshold(&mut self) -> Result<TempThreshold, Sx127xError<SPI::Error>> {
+        Ok(TempThreshold::from(get_bits(self.spi.read(IMAGE_CAL).await?, IMAGE_CAL_TEMP_THRESHOLD_MASK, 1)))
     }
 
     /// Sets the coefficient for Timer1.

@@ -265,6 +265,8 @@ impl FifoThreshold {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum LowBatteryThreshold {
     Trim1_695V = 0x0,
@@ -366,6 +368,25 @@ impl Default for SyncConfig {
             preamble_polarity: false,
             sync_on: true,
             sync_size: 0x3,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum TempThreshold {
+    Threshold5C = 0x0,
+    #[default]
+    Threshold10C = 0x1,
+    Threshold15C = 0x2,
+    Threshold20C = 0x3,
+}
+impl From<u8> for TempThreshold {
+    fn from(value: u8) -> Self {
+        match value {
+            0x0 => TempThreshold::Threshold5C,
+            0x1 => TempThreshold::Threshold10C,
+            0x2 => TempThreshold::Threshold15C,
+            _ => TempThreshold::Threshold20C,
         }
     }
 }

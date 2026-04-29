@@ -125,7 +125,15 @@ pub const FIFO_THRESH_FIFO_THRESHOLD_MASK: u8 = 0x3f;
 // TODO pub const TIMER_RESOL: u8 = 0x38;
 pub const TIMER_1_COEFF: u8 = 0x39;
 pub const TIMER_2_COEFF: u8 = 0x3a;
-// TODO pub const IMAGE_CAL: u8 = 0x3b;
+
+// RegImageCal -------------------------------------------------------------------------------------
+pub const IMAGE_CAL: u8 = 0x3b;
+pub const IMAGE_CAL_IMAGE_CAL_START_MASK: u8 = 0x40;
+pub const IMAGE_CAL_TEMP_CHANGE_MASK: u8 = 0x08;
+pub const IMAGE_CAL_TEMP_THRESHOLD_MASK: u8 = 0x06;
+// TODO other bits
+
+// -------------------------------------------------------------------------------------------------
 pub const TEMP: u8 = 0x3c;
 
 // RegLowBat ---------------------------------------------------------------------------------------

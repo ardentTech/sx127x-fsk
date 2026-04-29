@@ -36,3 +36,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `temp` method
 - `set_low_battery_detector`, `set_low_battery_trim` methods
 - `version` method
+- `start_image_calibration`, `temp_change_greater_than_threshold`, `temp_threshold`, `set_temp_threshold` methods
