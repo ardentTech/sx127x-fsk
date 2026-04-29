@@ -429,6 +429,13 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(AFC_FEI, byte | AFC_FEI_AGC_START_MASK).await
     }
 
+    /// Gets the temperature measurement.
+    ///
+    /// See: datasheet section 3.5.7
+    pub async fn temp(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(TEMP).await
+    }
+
     /// Sets the coefficient for Timer1.
     ///
     /// See: datasheet section 2.1.8.3
