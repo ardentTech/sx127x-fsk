@@ -238,6 +238,25 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(RX_DELAY, delay).await
     }
 
+    /// Sets the low battery detector on/off.
+    ///
+    /// See: datasheet section 3.2
+    pub async fn set_low_battery_detector(&mut self, on: bool) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(LOW_BAT).await?;
+        set_bits(&mut byte, on as u8, LOW_BAT_ON_MASK, 3);
+        self.spi.write(LOW_BAT, byte).await
+    }
+
+    /// Sets the trimming of the low battery detection threshold.
+    ///
+    /// See: datasheet section 3.2
+    pub async fn set_low_battery_trim(&mut self, threshold: LowBatteryThreshold) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(LOW_BAT).await?;
+        set_bits(&mut byte, threshold as u8, LOW_BAT_TRIM_MASK, 3);
+        self.spi.write(LOW_BAT, byte).await
+    }
+
+
     /// Sets the modulation type.
     pub async fn set_modulation_type(&mut self, modulation_type: ModulationType) -> Result<(), Sx127xError<SPI::Error>> {
         let mut byte = self.spi.read(OP_MODE).await?;

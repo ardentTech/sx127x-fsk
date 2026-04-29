@@ -127,7 +127,13 @@ pub const TIMER_1_COEFF: u8 = 0x39;
 pub const TIMER_2_COEFF: u8 = 0x3a;
 // TODO pub const IMAGE_CAL: u8 = 0x3b;
 pub const TEMP: u8 = 0x3c;
-// TODO pub const LOW_BAT: u8 = 0x3d;
+
+// RegLowBat ---------------------------------------------------------------------------------------
+pub const LOW_BAT: u8 = 0x3d;
+pub const LOW_BAT_ON_MASK: u8 = 0x08;
+pub const LOW_BAT_TRIM_MASK: u8 = 0x07;
+
+// -------------------------------------------------------------------------------------------------
 // TODO pub const IRQ_FLAGS_1: u8 = 0x3e;
 // TODO pub const IRQ_FLAGS_2: u8 = 0x3f;
 // TODO pub const PLL_HOP: u8 = 0x44;

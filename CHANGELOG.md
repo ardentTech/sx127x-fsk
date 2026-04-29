@@ -34,3 +34,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fifo_threshold`, `set_fifo_threshold`, `tx_start_condition`, `set_tx_start_condition` methods
 - `timer1_coefficient`, `set_timer1_coefficient`, `timer2_coefficient`, `set_timer2_coefficient` methods
 - `temp` method
+- `set_low_battery_detector`, `set_low_battery_trim` methods

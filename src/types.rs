@@ -265,6 +265,19 @@ impl FifoThreshold {
     }
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum LowBatteryThreshold {
+    Trim1_695V = 0x0,
+    Trim1_764V = 0x1,
+    #[default]
+    Trim1_835V = 0x2,
+    Trim1_905V = 0x3,
+    Trim1_976V = 0x4,
+    Trim2_045V = 0x5,
+    Trim2_116V = 0x6,
+    Trim2_185V = 0x7,
+}
+
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
