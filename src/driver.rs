@@ -476,6 +476,11 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(TxStartCondition::from(get_bits(self.spi.read(FIFO_THRESH).await?, FIFO_THRESH_TX_START_CONDITION_MASK, 7)))
     }
 
+    /// Gets the version code of the chip. Bits 7-4 give the full revision number; bits 3-0 give the metal mask revision number.
+    pub async fn version(&mut self) -> Result<u8, Sx127xError<SPI::Error>> {
+        self.spi.read(VERSION).await
+    }
+
     // PRIVATE -------------------------------------------------------------------------------------
 
     // Selects the LoRa modem when `on` == true, and the FSK/OOK modem when `on` == false.

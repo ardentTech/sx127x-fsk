@@ -35,3 +35,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `timer1_coefficient`, `set_timer1_coefficient`, `timer2_coefficient`, `set_timer2_coefficient` methods
 - `temp` method
 - `set_low_battery_detector`, `set_low_battery_trim` methods
+- `version` method
