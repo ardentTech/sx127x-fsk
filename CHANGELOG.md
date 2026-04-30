@@ -43,3 +43,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `image_calibration_running` method
 - `set_sequencer_transitions` method
 - `sequencer_transitions` method
+- `set_preamble_detector`, `preamble_detector` methods

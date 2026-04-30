@@ -115,6 +115,14 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok((get_bits(packet_config_2, PACKET_CONFIG_2_PAYLOAD_LENGTH, 0) as u16) << 8 | self.spi.read(PAYLOAD_LENGTH).await? as u16)
     }
 
+    /// Gets the preamble detector configuration.
+    ///
+    /// See: datasheet section 2.1.3.6
+    pub async fn preamble_detector(&mut self) -> Result<PreambleDetector, Sx127xError<SPI::Error>> {
+        let byte = self.spi.read(PREAMBLE_DETECT).await?;
+        Ok(PreambleDetector::from(byte))
+    }
+
     /// Gets the preamble size to be sent.
     pub async fn preamble_size(&mut self) -> Result<u16, Sx127xError<SPI::Error>> {
         let msb = self.spi.read(PREAMBLE_MSB).await?;
@@ -366,6 +374,17 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         set_bits(&mut packet_config_2, (length >> 8) as u8, PACKET_CONFIG_2_PAYLOAD_LENGTH, 0);
         self.spi.write(PACKET_CONFIG_2, packet_config_2).await?;
         self.spi.write(PAYLOAD_LENGTH, length as u8).await
+    }
+
+    /// Sets the preamble detector configuration.
+    ///
+    /// See: datasheet section 2.1.3.6
+    pub async fn set_preamble_detector(&mut self, detector: PreambleDetector) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = 0u8;
+        set_bits(&mut byte, detector.on as u8, PREAMBLE_DETECT_PREAMBLE_DETECTOR_ON_MASK, 7);
+        set_bits(&mut byte, detector.size as u8, PREAMBLE_DETECT_PREAMBLE_DETECTOR_SIZE_MASK, 5);
+        set_bits(&mut byte, detector.tolerance.0, PREAMBLE_DETECT_PREAMBLE_DETECTOR_TOL_MASK, 0);
+        self.spi.write(PREAMBLE_DETECT, byte).await
     }
 
     /// Sets the preamble size to be sent.

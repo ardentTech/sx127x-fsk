@@ -70,7 +70,14 @@ pub const AFC_MSB: u8 = 0x1b;
 pub const AFC_LSB: u8 = 0x1c;
 pub const FEI_MSB: u8 = 0x1d;
 pub const FEI_LSB: u8 = 0x1e;
-// TODO pub const PREAMBLE_DETECT: u8 = 0x1f;
+
+// RegPreambleDetect -------------------------------------------------------------------------------
+pub const PREAMBLE_DETECT: u8 = 0x1f;
+pub const PREAMBLE_DETECT_PREAMBLE_DETECTOR_ON_MASK: u8 = 0x80;
+pub const PREAMBLE_DETECT_PREAMBLE_DETECTOR_SIZE_MASK: u8 = 0x60;
+pub const PREAMBLE_DETECT_PREAMBLE_DETECTOR_TOL_MASK: u8 = 0x1f;
+
+// -------------------------------------------------------------------------------------------------
 // TODO pub const RX_TIMEOUT_1: u8 = 0x20;
 // TODO pub const RX_TIMEOUT_2: u8 = 0x21;
 // TODO pub const RX_TIMEOUT_3: u8 = 0x22;

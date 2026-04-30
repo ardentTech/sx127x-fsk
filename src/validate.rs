@@ -1,6 +1,7 @@
 const FDEV_MIN_HZ: u16 = 600;
 const FDEV_MAX_HZ: u32 = 200_000;
 const FIFO_THRESHOLD_MAX: u8 = 63;
+const PREAMBLE_DETECTOR_THRESHOLD_MAX: u8 = 31;
 const RSSI_OFFSET_MIN: i8 = -16;
 const RSSI_OFFSET_MAX: i8 = 15;
 const SYNC_SIZE_MAX: u8 = 7;
@@ -11,6 +12,10 @@ pub(crate) fn fdev(hz: u32) -> bool {
 
 pub(crate) fn fifo_threshold(threshold: u8) -> bool {
     threshold <= FIFO_THRESHOLD_MAX
+}
+
+pub(crate) fn preamble_detector_threshold(threshold: u8) -> bool {
+    threshold <= PREAMBLE_DETECTOR_THRESHOLD_MAX
 }
 
 pub(crate) fn rssi_offset(offset: i8) -> bool {
@@ -48,6 +53,16 @@ mod tests {
     #[test]
     fn fifo_threshold_ok() {
         assert!(fifo_threshold(FIFO_THRESHOLD_MAX - 1));
+    }
+
+    #[test]
+    fn preamble_detector_threshold_high() {
+        assert!(!preamble_detector_threshold(PREAMBLE_DETECTOR_THRESHOLD_MAX + 1));
+    }
+
+    #[test]
+    fn preamble_detector_threshold_ok() {
+        assert!(preamble_detector_threshold(PREAMBLE_DETECTOR_THRESHOLD_MAX - 1));
     }
 
     #[test]
