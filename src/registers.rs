@@ -119,8 +119,13 @@ pub const FIFO_THRESH: u8 = 0x35;
 pub const FIFO_THRESH_TX_START_CONDITION_MASK: u8 = 0x80;
 pub const FIFO_THRESH_FIFO_THRESHOLD_MASK: u8 = 0x3f;
 
+// RegSeqConfig1 -----------------------------------------------------------------------------------
+pub const SEQ_CONFIG_1: u8 = 0x36;
+pub const SEQ_CONFIG_1_SEQUENCER_START_MASK: u8 = 0x80;
+pub const SEQ_CONFIG_1_SEQUENCER_STOP_MASK: u8 = 0x40;
+// TODO other bits
+
 // -------------------------------------------------------------------------------------------------
-// TODO pub const SEQ_CONFIG_1: u8 = 0x36;
 // TODO pub const SEQ_CONFIG_2: u8 = 0x37;
 // TODO pub const TIMER_RESOL: u8 = 0x38;
 pub const TIMER_1_COEFF: u8 = 0x39;

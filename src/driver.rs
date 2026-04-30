@@ -492,6 +492,25 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(IMAGE_CAL, byte).await
     }
 
+    /// Starts the top level sequencer.
+    ///
+    /// See: datasheet section 2.1.8
+    pub async fn start_sequencer(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_device_mode(DeviceMode::STDBY).await?;
+        let mut byte = self.spi.read(SEQ_CONFIG_1).await?;
+        set_bits(&mut byte, 1, SEQ_CONFIG_1_SEQUENCER_START_MASK, 7);
+        self.spi.write(SEQ_CONFIG_1, byte).await
+    }
+
+    /// Stops the top level sequencer.
+    ///
+    /// See: datasheet section 2.1.8
+    pub async fn stop_sequencer(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(SEQ_CONFIG_1).await?;
+        set_bits(&mut byte, 1, SEQ_CONFIG_1_SEQUENCER_STOP_MASK, 6);
+        self.spi.write(SEQ_CONFIG_1, byte).await
+    }
+
     /// Gets the temperature measurement.
     ///
     /// See: datasheet section 3.5.7
