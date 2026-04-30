@@ -127,7 +127,13 @@ pub const SEQ_CONFIG_1_SEQUENCER_STOP_MASK: u8 = 0x40;
 
 // -------------------------------------------------------------------------------------------------
 // TODO pub const SEQ_CONFIG_2: u8 = 0x37;
-// TODO pub const TIMER_RESOL: u8 = 0x38;
+
+// RegTimerResol -----------------------------------------------------------------------------------
+pub const TIMER_RESOL: u8 = 0x38;
+pub const TIMER_RESOL_TIMER_1_RESOLUTION: u8 = 0x0c;
+pub const TIMER_RESOL_TIMER_2_RESOLUTION: u8 = 0x03;
+
+// -------------------------------------------------------------------------------------------------
 pub const TIMER_1_COEFF: u8 = 0x39;
 pub const TIMER_2_COEFF: u8 = 0x3a;
 

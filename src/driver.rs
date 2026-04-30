@@ -451,6 +451,24 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(IMAGE_CAL, byte).await
     }
 
+    /// Sets the resolution of Timer 1.
+    ///
+    /// See: datasheet section 2.1.8.3
+    pub async fn set_timer1(&mut self, config: TimerConfig) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(TIMER_RESOL).await?;
+        set_bits(&mut byte, config as u8, TIMER_RESOL_TIMER_1_RESOLUTION, 2);
+        self.spi.write(TIMER_RESOL, byte).await
+    }
+
+    /// Sets the resolution of Timer 2.
+    ///
+    /// See: datasheet section 2.1.8.3
+    pub async fn set_timer2(&mut self, config: TimerConfig) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(TIMER_RESOL).await?;
+        set_bits(&mut byte, config as u8, TIMER_RESOL_TIMER_2_RESOLUTION, 0);
+        self.spi.write(TIMER_RESOL, byte).await
+    }
+
     /// Sets the coefficient for Timer1.
     ///
     /// See: datasheet section 2.1.8.3

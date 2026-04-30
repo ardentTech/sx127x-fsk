@@ -39,3 +39,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `start_image_calibration`, `temp_change_greater_than_threshold`, `temp_threshold`, `set_temp_threshold` methods
 - `auto_image_calibration`, `set_auto_image_calibration` methods
 - `start_sequencer`, `stop_sequencer` methods
+- `set_timer1`, `set_timer2` methods

@@ -390,3 +390,12 @@ impl From<u8> for TempThreshold {
         }
     }
 }
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum TimerConfig {
+    #[default]
+    Disabled = 0x0,
+    Resolution64us = 0x1,
+    Resolution4_1ms = 0x2,
+    Resolution262ms = 0x3,
+}
