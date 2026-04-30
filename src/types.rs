@@ -110,6 +110,12 @@ impl From<u8> for DeviceMode {
 
 // -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub enum FastFrequencyHoppingMode {
+    FstxOrFsrxRequested = 0x0,
+    RegFrfLsbWritten = 0x1,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ModulationType {
     FSK = 0x00,
     OOK = 0x01

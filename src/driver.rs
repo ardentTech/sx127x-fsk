@@ -77,6 +77,14 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(FifoThreshold(get_bits(self.spi.read(FIFO_THRESH).await?, FIFO_THRESH_FIFO_THRESHOLD_MASK, 0)))
     }
 
+    /// Gets whether or not the image calibration is running.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn image_calibration_running(&mut self) -> Result<bool, Sx127xError<SPI::Error>> {
+        let byte = self.spi.read(IMAGE_CAL).await?;
+        Ok(get_bits(byte, IMAGE_CAL_IMAGE_CAL_RUNNING_MASK, 5) == 1)
+    }
+
     /// Gets the node address used in address filtering.
     ///
     /// See: datasheet section 2.1.13.6
@@ -204,6 +212,15 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(OP_MODE).await?;
         set_bits(&mut byte, device_mode as u8, OP_MODE_MODE_MASK, 0);
         self.spi.write(OP_MODE, byte).await
+    }
+
+    /// Sets the fast frequency hopping mode.
+    ///
+    /// See: datasheet section 2.1.5.6
+    pub async fn set_fast_frequency_hopping_mode(&mut self, mode: FastFrequencyHoppingMode) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(PLL_HOP).await?;
+        set_bits(&mut byte, mode as u8, PLL_HOP_FAST_HOP_ON_MASK, 7);
+        self.spi.write(PLL_HOP, byte).await
     }
 
     /// Sets the frequency deviation (fdev).

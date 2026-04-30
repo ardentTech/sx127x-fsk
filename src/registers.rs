@@ -141,6 +141,7 @@ pub const TIMER_2_COEFF: u8 = 0x3a;
 pub const IMAGE_CAL: u8 = 0x3b;
 pub const IMAGE_CAL_AUTO_IMAGE_CAL_ON: u8 = 0x80;
 pub const IMAGE_CAL_IMAGE_CAL_START_MASK: u8 = 0x40;
+pub const IMAGE_CAL_IMAGE_CAL_RUNNING_MASK: u8 = 0x20;
 pub const IMAGE_CAL_TEMP_CHANGE_MASK: u8 = 0x08;
 pub const IMAGE_CAL_TEMP_THRESHOLD_MASK: u8 = 0x06;
 pub const IMAGE_CAL_TEMP_MONITOR_OFF: u8 = 0x01;
@@ -156,6 +157,10 @@ pub const LOW_BAT_TRIM_MASK: u8 = 0x07;
 // -------------------------------------------------------------------------------------------------
 // TODO pub const IRQ_FLAGS_1: u8 = 0x3e;
 // TODO pub const IRQ_FLAGS_2: u8 = 0x3f;
-// TODO pub const PLL_HOP: u8 = 0x44;
+
+// RegPllHop ---------------------------------------------------------------------------------------
+pub const PLL_HOP: u8 = 0x44;
+pub const PLL_HOP_FAST_HOP_ON_MASK: u8 = 0x80;
+
+// -------------------------------------------------------------------------------------------------
 pub const BITRATE_FRAC: u8 = 0x5d;
-// TODO pub const : u8 = 0x;

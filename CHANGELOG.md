@@ -40,3 +40,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `auto_image_calibration`, `set_auto_image_calibration` methods
 - `start_sequencer`, `stop_sequencer` methods
 - `set_timer1`, `set_timer2` methods
+- `image_calibration_running` method
