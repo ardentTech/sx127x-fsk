@@ -123,10 +123,17 @@ pub const FIFO_THRESH_FIFO_THRESHOLD_MASK: u8 = 0x3f;
 pub const SEQ_CONFIG_1: u8 = 0x36;
 pub const SEQ_CONFIG_1_SEQUENCER_START_MASK: u8 = 0x80;
 pub const SEQ_CONFIG_1_SEQUENCER_STOP_MASK: u8 = 0x40;
-// TODO other bits
+pub const SEQ_CONFIG_1_IDLE_MODE_MASK: u8 = 0x20;
+pub const SEQ_CONFIG_1_FROM_START_MASK: u8 = 0x18;
+pub const SEQ_CONFIG_1_LOW_POWER_SELECTION_MASK: u8 = 0x04;
+pub const SEQ_CONFIG_1_FROM_IDLE_MASK: u8 = 0x02;
+pub const SEQ_CONFIG_1_FROM_TRANSMIT_MASK: u8 = 0x01;
 
-// -------------------------------------------------------------------------------------------------
-// TODO pub const SEQ_CONFIG_2: u8 = 0x37;
+// RegSeqConfig2 -----------------------------------------------------------------------------------
+pub const SEQ_CONFIG_2: u8 = 0x37;
+pub const SEQ_CONFIG_2_FROM_RECEIVE_MASK: u8 = 0xe0;
+pub const SEQ_CONFIG_2_FROM_RX_TIMEOUT_MASK: u8 = 0x18;
+pub const SEQ_CONFIG_2_FROM_PACKET_RECEIVED: u8 = 0x07;
 
 // RegTimerResol -----------------------------------------------------------------------------------
 pub const TIMER_RESOL: u8 = 0x38;

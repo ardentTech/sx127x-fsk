@@ -360,6 +360,87 @@ pub enum RssiSmoothing {
 }
 
 // -------------------------------------------------------------------------------------------------
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum IdleMode {
+    #[default]
+    Standby = 0x0,
+    Sleep = 0x1,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum FromStart {
+    #[default]
+    LowPowerSelection = 0x0,
+    ReceiveState = 0x1,
+    TransmitState = 0x2,
+    TransmitStateOnFifoLevelInterrupt = 0x3,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum LowPowerSelection {
+    #[default]
+    SequencerOffState = 0x0,
+    IdleState = 0x1,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum FromIdle {
+    #[default]
+    TransmitState = 0x0,
+    ReceiveState = 0x1,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum FromTransmit {
+    #[default]
+    LowPowerSelection = 0x0,
+    ReceiveState = 0x1,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum FromReceive {
+    #[default]
+    None = 0x0,
+    PacketReceivedStateOnPayloadReadyInterrupt = 0x1,
+    LowPowerSelectionOnPayloadReadyInterrupt = 0x2,
+    PacketReceivedStateOnCrcOkInterrupt = 0x3,
+    SequencerOffStateOnRssiInterrupt = 0x4,
+    SequencerOffStateOnSyncAddressInterrupt = 0x5,
+    SequencerOffStateOnPreambleDetectInterrupt = 0x6,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum FromRxTimeout {
+    #[default]
+    ReceiveState = 0x0,
+    TransmitState = 0x1,
+    LowPowerSelection = 0x2,
+    SequencerOffState = 0x3,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum FromPacketReceived {
+    #[default]
+    SequencerOffState = 0x0,
+    TransmitStateOnFifoEmptyInterrupt = 0x1,
+    LowPowerSelection = 0x2,
+    ReceiveViaFsMode = 0x3,
+    ReceiveState = 0x4,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SequencerTransitions {
+    pub from_idle: FromIdle,
+    pub from_packet_received: FromPacketReceived,
+    pub from_receive: FromReceive,
+    pub from_rx_timeout: FromRxTimeout,
+    pub from_start: FromStart,
+    pub from_transmit: FromTransmit,
+    pub idle_mode: IdleMode,
+    pub low_power_selection: LowPowerSelection,
+}
+
+// -------------------------------------------------------------------------------------------------
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SyncConfig {
     pub auto_restart_rx_mode: AutoRestartRxMode,

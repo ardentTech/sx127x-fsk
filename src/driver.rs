@@ -422,6 +422,25 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(RX_CONFIG, byte).await
     }
 
+    /// Sets the sequencer transition options.
+    ///
+    /// See: datasheet section 2.1.8.2
+    pub async fn set_sequencer_transitions(&mut self, options: SequencerTransitions) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(SEQ_CONFIG_1).await?;
+        set_bits(&mut byte, options.idle_mode as u8, SEQ_CONFIG_1_IDLE_MODE_MASK, 5);
+        set_bits(&mut byte, options.from_start as u8, SEQ_CONFIG_1_FROM_START_MASK, 4);
+        set_bits(&mut byte, options.low_power_selection as u8, SEQ_CONFIG_1_LOW_POWER_SELECTION_MASK, 2);
+        set_bits(&mut byte, options.from_idle as u8, SEQ_CONFIG_1_FROM_IDLE_MASK, 1);
+        set_bits(&mut byte, options.from_transmit as u8, SEQ_CONFIG_1_FROM_TRANSMIT_MASK, 0);
+        self.spi.write(SEQ_CONFIG_1, byte).await?;
+
+        let mut byte = self.spi.read(SEQ_CONFIG_2).await?;
+        set_bits(&mut byte, options.from_receive as u8, SEQ_CONFIG_2_FROM_RECEIVE_MASK, 5);
+        set_bits(&mut byte, options.from_rx_timeout as u8, SEQ_CONFIG_2_FROM_RX_TIMEOUT_MASK, 3);
+        set_bits(&mut byte, options.from_packet_received as u8, SEQ_CONFIG_2_FROM_PACKET_RECEIVED, 0);
+        self.spi.write(SEQ_CONFIG_2, byte).await
+    }
+
     /// Sets the sync word recognition configuration.
     ///
     /// See: datasheet sections 2.1.7.2, 2.1.10.1, 2.1.13.6
