@@ -142,6 +142,16 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.read(RSSI_VALUE).await
     }
 
+    /// Gets the sequencer transition options.
+    ///
+    /// See: datasheet section 2.1.8.2
+    pub async fn sequencer_transitions(&mut self) -> Result<SequencerTransitions, Sx127xError<SPI::Error>> {
+        let mut res = SequencerTransitions::default();
+        res.set_config1(self.spi.read(SEQ_CONFIG_1).await?);
+        res.set_config2(self.spi.read(SEQ_CONFIG_2).await?);
+        Ok(res)
+    }
+
     /// Sets the automatic frequency correction (AFC) value.
     ///
     /// See: datasheet section 2.1.3.5

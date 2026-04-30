@@ -1,4 +1,7 @@
+use sx127x_common::bits::get_bits;
 use sx127x_common::error::Sx127xError;
+use crate::registers::{SEQ_CONFIG_1_FROM_IDLE_MASK, SEQ_CONFIG_1_FROM_START_MASK, SEQ_CONFIG_1_FROM_TRANSMIT_MASK, SEQ_CONFIG_1_IDLE_MODE_MASK, SEQ_CONFIG_1_LOW_POWER_SELECTION_MASK, SEQ_CONFIG_2_FROM_PACKET_RECEIVED, SEQ_CONFIG_2_FROM_RECEIVE_MASK, SEQ_CONFIG_2_FROM_RX_TIMEOUT_MASK};
+use crate::types::FromReceive::{Disabled, LowPowerSelectionOnPayloadReadyInterrupt, PacketReceivedStateOnCrcOkInterrupt, PacketReceivedStateOnPayloadReadyInterrupt, SequencerOffStateOnPreambleDetectInterrupt, SequencerOffStateOnRssiInterrupt, SequencerOffStateOnSyncAddressInterrupt};
 use crate::validate;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -366,6 +369,14 @@ pub enum IdleMode {
     Standby = 0x0,
     Sleep = 0x1,
 }
+impl From<u8> for IdleMode {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => IdleMode::Sleep,
+            _ => IdleMode::Standby,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum FromStart {
@@ -375,12 +386,30 @@ pub enum FromStart {
     TransmitState = 0x2,
     TransmitStateOnFifoLevelInterrupt = 0x3,
 }
+impl From<u8> for FromStart {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => FromStart::ReceiveState,
+            0x2 => FromStart::TransmitState,
+            0x3 => FromStart::TransmitStateOnFifoLevelInterrupt,
+            _ => FromStart::LowPowerSelection,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum LowPowerSelection {
     #[default]
     SequencerOffState = 0x0,
     IdleState = 0x1,
+}
+impl From<u8> for LowPowerSelection {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => LowPowerSelection::IdleState,
+            _=> LowPowerSelection::SequencerOffState,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -389,6 +418,14 @@ pub enum FromIdle {
     TransmitState = 0x0,
     ReceiveState = 0x1,
 }
+impl From<u8> for FromIdle {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => FromIdle::ReceiveState,
+            _ => FromIdle::TransmitState,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum FromTransmit {
@@ -396,17 +433,38 @@ pub enum FromTransmit {
     LowPowerSelection = 0x0,
     ReceiveState = 0x1,
 }
+impl From<u8> for FromTransmit {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => FromTransmit::ReceiveState,
+            _ => FromTransmit::LowPowerSelection,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum FromReceive {
     #[default]
-    None = 0x0,
+    Disabled = 0x0,
     PacketReceivedStateOnPayloadReadyInterrupt = 0x1,
     LowPowerSelectionOnPayloadReadyInterrupt = 0x2,
     PacketReceivedStateOnCrcOkInterrupt = 0x3,
     SequencerOffStateOnRssiInterrupt = 0x4,
     SequencerOffStateOnSyncAddressInterrupt = 0x5,
     SequencerOffStateOnPreambleDetectInterrupt = 0x6,
+}
+impl From<u8> for FromReceive {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => PacketReceivedStateOnPayloadReadyInterrupt,
+            0x2 => LowPowerSelectionOnPayloadReadyInterrupt,
+            0x3 => PacketReceivedStateOnCrcOkInterrupt,
+            0x4 => SequencerOffStateOnRssiInterrupt,
+            0x5 => SequencerOffStateOnSyncAddressInterrupt,
+            0x6 => SequencerOffStateOnPreambleDetectInterrupt,
+            _ => Disabled
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -416,6 +474,16 @@ pub enum FromRxTimeout {
     TransmitState = 0x1,
     LowPowerSelection = 0x2,
     SequencerOffState = 0x3,
+}
+impl From<u8> for FromRxTimeout {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => FromRxTimeout::TransmitState,
+            0x2 => FromRxTimeout::LowPowerSelection,
+            0x3 => FromRxTimeout::SequencerOffState,
+            _ => FromRxTimeout::ReceiveState,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -427,8 +495,19 @@ pub enum FromPacketReceived {
     ReceiveViaFsMode = 0x3,
     ReceiveState = 0x4,
 }
+impl From<u8> for FromPacketReceived {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => FromPacketReceived::TransmitStateOnFifoEmptyInterrupt,
+            0x2 => FromPacketReceived::LowPowerSelection,
+            0x3 => FromPacketReceived::ReceiveViaFsMode,
+            0x4 => FromPacketReceived::ReceiveState,
+            _ => FromPacketReceived::SequencerOffState,
+        }
+    }
+}
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct SequencerTransitions {
     pub from_idle: FromIdle,
     pub from_packet_received: FromPacketReceived,
@@ -438,6 +517,21 @@ pub struct SequencerTransitions {
     pub from_transmit: FromTransmit,
     pub idle_mode: IdleMode,
     pub low_power_selection: LowPowerSelection,
+}
+impl SequencerTransitions {
+    pub(crate) fn set_config1(&mut self, byte: u8) {
+        self.idle_mode = IdleMode::from(get_bits(byte, SEQ_CONFIG_1_IDLE_MODE_MASK, 5));
+        self.from_start = FromStart::from(get_bits(byte, SEQ_CONFIG_1_FROM_START_MASK, 3));
+        self.low_power_selection = LowPowerSelection::from(get_bits(byte, SEQ_CONFIG_1_LOW_POWER_SELECTION_MASK, 2));
+        self.from_idle = FromIdle::from(get_bits(byte, SEQ_CONFIG_1_FROM_IDLE_MASK, 1));
+        self.from_transmit = FromTransmit::from(get_bits(byte, SEQ_CONFIG_1_FROM_TRANSMIT_MASK, 0));
+    }
+
+    pub(crate) fn set_config2(&mut self, byte: u8) {
+        self.from_receive = FromReceive::from(get_bits(byte, SEQ_CONFIG_2_FROM_RECEIVE_MASK, 5));
+        self.from_rx_timeout = FromRxTimeout::from(get_bits(byte, SEQ_CONFIG_2_FROM_RX_TIMEOUT_MASK, 3));
+        self.from_packet_received = FromPacketReceived::from(get_bits(byte, SEQ_CONFIG_2_FROM_PACKET_RECEIVED, 0));
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

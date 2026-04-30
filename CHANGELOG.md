@@ -42,3 +42,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_timer1`, `set_timer2` methods
 - `image_calibration_running` method
 - `set_sequencer_transitions` method
+- `sequencer_transitions` method
