@@ -128,10 +128,11 @@ pub const TIMER_2_COEFF: u8 = 0x3a;
 
 // RegImageCal -------------------------------------------------------------------------------------
 pub const IMAGE_CAL: u8 = 0x3b;
+pub const IMAGE_CAL_AUTO_IMAGE_CAL_ON: u8 = 0x80;
 pub const IMAGE_CAL_IMAGE_CAL_START_MASK: u8 = 0x40;
 pub const IMAGE_CAL_TEMP_CHANGE_MASK: u8 = 0x08;
 pub const IMAGE_CAL_TEMP_THRESHOLD_MASK: u8 = 0x06;
-// TODO other bits
+pub const IMAGE_CAL_TEMP_MONITOR_OFF: u8 = 0x01;
 
 // -------------------------------------------------------------------------------------------------
 pub const TEMP: u8 = 0x3c;

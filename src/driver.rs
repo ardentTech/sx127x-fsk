@@ -20,6 +20,13 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(driver)
     }
 
+    /// Gets the image calibration mechanism on/off.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn auto_image_calibration(&mut self) -> Result<bool, Sx127xError<SPI::Error>> {
+        Ok(get_bits(self.spi.read(IMAGE_CAL).await?, IMAGE_CAL_AUTO_IMAGE_CAL_ON, 7) == 1)
+    }
+
     /// Gets the bit rate in b/s.
     ///
     /// See: datasheet section 2.1.1
@@ -153,6 +160,15 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         set_bits(&mut byte, bw.exp, AFC_BW_EXP_MASK, 0);
         set_bits(&mut byte, bw.mant, AFC_BW_MANT_MASK, 3);
         self.spi.write(AFC_BW, byte).await
+    }
+
+    /// Sets the image calibration mechanism on/off.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn set_auto_image_calibration(&mut self, on: bool) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(IMAGE_CAL).await?;
+        set_bits(&mut byte, on as u8, IMAGE_CAL_AUTO_IMAGE_CAL_ON, 7);
+        self.spi.write(IMAGE_CAL, byte).await
     }
 
     /// Sets the bit rate.
@@ -417,6 +433,15 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         Ok(())
     }
 
+    /// Sets the temperature monitor operation on/off.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn set_temp_monitor(&mut self, on: bool) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(IMAGE_CAL).await?;
+        set_bits(&mut byte, !(on as u8), IMAGE_CAL_TEMP_MONITOR_OFF, 0);
+        self.spi.write(IMAGE_CAL, byte).await
+    }
+
     /// Sets the temperature change threshold to trigger a new I/Q calibration.
     ///
     /// See: datasheet section 2.1.3.8
@@ -480,6 +505,13 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     pub async fn temp_change_greater_than_threshold(&mut self) -> Result<bool, Sx127xError<SPI::Error>> {
         let byte = self.spi.read(IMAGE_CAL).await?;
         Ok(get_bits(byte, IMAGE_CAL_TEMP_CHANGE_MASK, 3) == 1)
+    }
+
+    /// Gets the temperature monitor operation on/off.
+    ///
+    /// See: datasheet section 2.1.3.8
+    pub async fn temp_monitor(&mut self) -> Result<bool, Sx127xError<SPI::Error>> {
+        Ok(get_bits(self.spi.read(IMAGE_CAL).await?, IMAGE_CAL_TEMP_MONITOR_OFF, 0) == 0)
     }
 
     /// Gets the temperature change threshold to trigger a new I/Q calibration.
