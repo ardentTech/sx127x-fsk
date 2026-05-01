@@ -52,6 +52,13 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(OSC, byte | OSC_RC_CAL_START_MASK).await
     }
 
+    /// Clears the AFC register set in RX mode.
+    pub async fn clear_afc_register(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(AFC_FEI).await?;
+        set_bits(&mut byte, 1, AFC_FEI_AFC_CLEAR_MASK, 1);
+        self.spi.write(AFC_FEI, byte).await
+    }
+
     /// Gets the frequency deviation (fdev) in Hz.
     ///
     /// See: datasheet section 2.1.2.1
@@ -470,6 +477,13 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(SEQ_CONFIG_2, byte).await
     }
 
+    /// Sets the RX signal sync timeout.
+    ///
+    /// See: datasheet section 2.1.3.9
+    pub async fn set_rx_signal_sync_timeout(&mut self, timeout: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RX_TIMEOUT_3, timeout).await
+    }
+
     /// Sets the sync word recognition configuration.
     ///
     /// See: datasheet sections 2.1.7.2, 2.1.10.1, 2.1.13.6
@@ -514,6 +528,20 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         let mut byte = self.spi.read(IMAGE_CAL).await?;
         set_bits(&mut byte, temp_threshold as u8, IMAGE_CAL_TEMP_THRESHOLD_MASK, 1);
         self.spi.write(IMAGE_CAL, byte).await
+    }
+
+    /// Sets the RX preamble timeout.
+    ///
+    /// See: datasheet section 2.1.3.9
+    pub async fn set_rx_preamble_timeout(&mut self, timeout: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RX_TIMEOUT_2, timeout).await
+    }
+
+    /// Sets the RX RSSI timeout.
+    ///
+    /// See: datasheet section 2.1.3.9
+    pub async fn set_rx_rssi_timeout(&mut self, timeout: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        self.spi.write(RX_TIMEOUT_1, timeout).await
     }
 
     /// Sets the resolution of Timer 1.

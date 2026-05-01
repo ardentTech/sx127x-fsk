@@ -62,7 +62,7 @@ pub const OOK_AVG_OOK_AVERAGE_THRESH_FILT: u8 = 0x03;
 // RegAfcFei ---------------------------------------------------------------------------------------
 pub const AFC_FEI: u8 = 0x1a;
 pub const AFC_FEI_AGC_START_MASK: u8 = 0x10;
-// TODO pub const AFC_FEI_AFC_CLEAR_MASK: u8 = 0x02;
+pub const AFC_FEI_AFC_CLEAR_MASK: u8 = 0x02;
 pub const AFC_FEI_AFC_AUTO_CLEAR_ON_MASK: u8 = 0x01;
 
 // -------------------------------------------------------------------------------------------------
@@ -78,9 +78,9 @@ pub const PREAMBLE_DETECT_PREAMBLE_DETECTOR_SIZE_MASK: u8 = 0x60;
 pub const PREAMBLE_DETECT_PREAMBLE_DETECTOR_TOL_MASK: u8 = 0x1f;
 
 // -------------------------------------------------------------------------------------------------
-// TODO pub const RX_TIMEOUT_1: u8 = 0x20;
-// TODO pub const RX_TIMEOUT_2: u8 = 0x21;
-// TODO pub const RX_TIMEOUT_3: u8 = 0x22;
+pub const RX_TIMEOUT_1: u8 = 0x20;
+pub const RX_TIMEOUT_2: u8 = 0x21;
+pub const RX_TIMEOUT_3: u8 = 0x22;
 pub const RX_DELAY: u8 = 0x23;
 
 // RegOsc ------------------------------------------------------------------------------------------

@@ -44,3 +44,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_sequencer_transitions` method
 - `sequencer_transitions` method
 - `set_preamble_detector`, `preamble_detector` methods
+- `set_signal_sync_timeout`, `set_rx_preamble_timeout`, `set_rx_rssi_timeout` methods
