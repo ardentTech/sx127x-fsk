@@ -292,6 +292,21 @@ pub enum LowBatteryThreshold {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum DataMode {
+    #[default]
+    Continuous = 0x0,
+    Packet = 0x1,
+}
+impl From<u8> for DataMode {
+    fn from(value: u8) -> Self {
+        match value {
+            0x1 => DataMode::Packet,
+            _ => DataMode::Continuous,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum PacketFormat {
     FixedLength = 0x0,
     #[default]
@@ -306,24 +321,32 @@ impl From<u8> for PacketFormat {
     }
 }
 
-pub struct PacketConfig1 {
+pub struct PacketConfig {
     pub address_filtering: AddressFiltering,
+    pub beacon_on: bool,
     pub crc_auto_clear_off: bool,
     pub crc_on: bool,
     pub crc_whitening_type: CrcWhiteningType,
+    pub data_mode: DataMode,
     pub dc_free: DcFree,
+    pub io_home_on: bool,
     pub packet_format: PacketFormat,
+    pub payload_length: u16,
 }
 
-impl Default for PacketConfig1 {
+impl Default for PacketConfig {
     fn default() -> Self {
         Self {
             address_filtering: AddressFiltering::default(),
+            beacon_on: false,
             crc_auto_clear_off: false,
             crc_on: true,
             crc_whitening_type: CrcWhiteningType::default(),
+            data_mode: DataMode::default(),
             dc_free: DcFree::default(),
-            packet_format: PacketFormat::default()
+            io_home_on: false,
+            packet_format: PacketFormat::default(),
+            payload_length: 0x40,
         }
     }
 }

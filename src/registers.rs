@@ -113,8 +113,11 @@ pub const PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK: u8 = 0x01;
 
 // RegPacketConfig2 --------------------------------------------------------------------------------
 pub const PACKET_CONFIG_2: u8 = 0x31;
-// TODO masks
-pub const PACKET_CONFIG_2_PAYLOAD_LENGTH: u8 = 0x07;
+pub const PACKET_CONFIG_2_DATA_MODE_MASK: u8 = 0x40;
+pub const PACKET_CONFIG_2_IO_HOME_ON_MASK: u8 = 0x20;
+// pub const PACKET_CONFIG_2_IO_HOME_POWER_FRAME_MASK: u8 = 0x10;
+pub const PACKET_CONFIG_2_BEACON_ON_MASK: u8 = 0x08;
+pub const PACKET_CONFIG_2_PAYLOAD_LENGTH_MASK: u8 = 0x07;
 
 // -------------------------------------------------------------------------------------------------
 pub const PAYLOAD_LENGTH: u8 = 0x32;

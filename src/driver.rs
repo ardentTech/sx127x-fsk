@@ -102,15 +102,21 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     /// Gets the packet mode settings.
     ///
     /// See: datasheet sections 2.1.13.2, 2.1.13.4, 2.1.13.6, 2.1.13.7
-    pub async fn packet_config1(&mut self) -> Result<PacketConfig1, Sx127xError<SPI::Error>> {
-        let byte = self.spi.read(PACKET_CONFIG_1).await?;
-        Ok(PacketConfig1 {
-            address_filtering: AddressFiltering::from(get_bits(byte, PACKET_CONFIG_1_ADDRESS_FILTERING_MASK, 1)),
-            crc_auto_clear_off: get_bits(byte, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3) == 0,
-            crc_on: get_bits(byte, PACKET_CONFIG_1_CRC_ON_MASK, 1) == 1,
-            crc_whitening_type: CrcWhiteningType::from(get_bits(byte, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0)),
-            dc_free: DcFree::from(get_bits(byte, PACKET_CONFIG_1_DC_FREE_MASK, 5)),
-            packet_format: PacketFormat::from(get_bits(byte, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7)),
+    pub async fn packet_config(&mut self) -> Result<PacketConfig, Sx127xError<SPI::Error>> {
+        let config_1 = self.spi.read(PACKET_CONFIG_1).await?;
+        let config_2 = self.spi.read(PACKET_CONFIG_2).await?;
+
+        Ok(PacketConfig {
+            address_filtering: AddressFiltering::from(get_bits(config_1, PACKET_CONFIG_1_ADDRESS_FILTERING_MASK, 1)),
+            beacon_on: get_bits(config_2, PACKET_CONFIG_2_BEACON_ON_MASK, 3) == 1,
+            crc_auto_clear_off: get_bits(config_1, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3) == 0,
+            crc_on: get_bits(config_1, PACKET_CONFIG_1_CRC_ON_MASK, 1) == 1,
+            crc_whitening_type: CrcWhiteningType::from(get_bits(config_1, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0)),
+            data_mode: DataMode::from(get_bits(config_2, PACKET_CONFIG_2_DATA_MODE_MASK, 6)),
+            dc_free: DcFree::from(get_bits(config_1, PACKET_CONFIG_1_DC_FREE_MASK, 5)),
+            io_home_on: get_bits(config_2, PACKET_CONFIG_2_IO_HOME_ON_MASK, 3) == 1,
+            packet_format: PacketFormat::from(get_bits(config_1, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7)),
+            payload_length: (get_bits(config_2, PACKET_CONFIG_2_PAYLOAD_LENGTH_MASK, 0) as u16) << 8 | self.spi.read(PAYLOAD_LENGTH).await? as u16
         })
     }
 
@@ -119,7 +125,7 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     /// See: datasheet section 2.1.13.2
     pub async fn payload_length(&mut self) -> Result<u16, Sx127xError<SPI::Error>> {
         let packet_config_2 = self.spi.read(PACKET_CONFIG_2).await?;
-        Ok((get_bits(packet_config_2, PACKET_CONFIG_2_PAYLOAD_LENGTH, 0) as u16) << 8 | self.spi.read(PAYLOAD_LENGTH).await? as u16)
+        Ok((get_bits(packet_config_2, PACKET_CONFIG_2_PAYLOAD_LENGTH_MASK, 0) as u16) << 8 | self.spi.read(PAYLOAD_LENGTH).await? as u16)
     }
 
     /// Gets the preamble detector configuration.
@@ -361,16 +367,25 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     /// Sets packet mode settings.
     ///
     /// See: datasheet sections 2.1.13.2, 2.1.13.4, 2.1.13.6, 2.1.13.7
-    pub async fn set_packet_config1(&mut self, config: PacketConfig1) -> Result<(), Sx127xError<SPI::Error>> {
-        let mut byte = 0u8;
+    pub async fn set_packet_config(&mut self, config: PacketConfig) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut config1 = 0u8;
         // TODO break all of these out into individual methods?
-        set_bits(&mut byte, config.packet_format as u8, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7);
-        set_bits(&mut byte, config.dc_free as u8, PACKET_CONFIG_1_DC_FREE_MASK, 5);
-        set_bits(&mut byte, config.crc_on as u8, PACKET_CONFIG_1_CRC_ON_MASK, 4);
-        set_bits(&mut byte, config.crc_auto_clear_off as u8, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3);
-        set_bits(&mut byte, config.address_filtering as u8, PACKET_CONFIG_1_ADDRESS_FILTERING_MASK, 1);
-        set_bits(&mut byte, config.crc_whitening_type as u8, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0);
-        self.spi.write(PACKET_CONFIG_1, byte).await
+        set_bits(&mut config1, config.packet_format as u8, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7);
+        set_bits(&mut config1, config.dc_free as u8, PACKET_CONFIG_1_DC_FREE_MASK, 5);
+        set_bits(&mut config1, config.crc_on as u8, PACKET_CONFIG_1_CRC_ON_MASK, 4);
+        set_bits(&mut config1, config.crc_auto_clear_off as u8, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3);
+        set_bits(&mut config1, config.address_filtering as u8, PACKET_CONFIG_1_ADDRESS_FILTERING_MASK, 1);
+        set_bits(&mut config1, config.crc_whitening_type as u8, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0);
+        self.spi.write(PACKET_CONFIG_1, config1).await?;
+
+        let mut config2 = 0u8;
+        set_bits(&mut config2, config.data_mode as u8, PACKET_CONFIG_2_DATA_MODE_MASK, 6);
+        set_bits(&mut config2, config.io_home_on as u8, PACKET_CONFIG_2_IO_HOME_ON_MASK, 5);
+        set_bits(&mut config2, config.beacon_on as u8, PACKET_CONFIG_2_BEACON_ON_MASK, 3);
+        set_bits(&mut config2, (config.payload_length >> 8) as u8, PACKET_CONFIG_2_PAYLOAD_LENGTH_MASK, 0);
+        self.spi.write(PACKET_CONFIG_2, config2).await?;
+
+        self.spi.write(PAYLOAD_LENGTH, config.payload_length as u8).await
     }
 
     /// Sets the payload length.
@@ -378,7 +393,7 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     /// See: datasheet section 2.1.13.2
     pub async fn set_payload_length(&mut self, length: u16) -> Result<(), Sx127xError<SPI::Error>> {
         let mut packet_config_2 = self.spi.read(PACKET_CONFIG_2).await?;
-        set_bits(&mut packet_config_2, (length >> 8) as u8, PACKET_CONFIG_2_PAYLOAD_LENGTH, 0);
+        set_bits(&mut packet_config_2, (length >> 8) as u8, PACKET_CONFIG_2_PAYLOAD_LENGTH_MASK, 0);
         self.spi.write(PACKET_CONFIG_2, packet_config_2).await?;
         self.spi.write(PAYLOAD_LENGTH, length as u8).await
     }

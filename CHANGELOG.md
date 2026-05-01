@@ -27,7 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `set_preamble_size`, `preamble_size` methods
 - `set_sync_config` method
 - `set_sync_values` method
-- `packet_config1`, `set_packet_config1` methods
 - `payload_length`, `set_payload_length` methods
 - `node_addr`, `set_node_addr` methods
 - `broadcast_addr`, `set_broadcast_addr` methods
@@ -45,3 +44,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `sequencer_transitions` method
 - `set_preamble_detector`, `preamble_detector` methods
 - `set_signal_sync_timeout`, `set_rx_preamble_timeout`, `set_rx_rssi_timeout` methods
+- `packet_config`, `set_packet_config` methods
