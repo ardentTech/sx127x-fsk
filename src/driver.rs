@@ -6,7 +6,7 @@ use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
 use crate::data_mode::DataMode;
-use crate::dio::{ContinuousDio0Signal, PacketDio0Signal};
+use crate::dio::*;
 use crate::registers::*;
 use crate::types::*;
 
@@ -18,15 +18,53 @@ pub struct Sx127xFsk<DM, SPI> {
 
 impl<SPI: SpiDevice> Sx127xFsk<crate::data_mode::ContinuousMode, SPI> {
     pub async fn set_dio0(&mut self, signal: ContinuousDio0Signal) -> Result<(), Sx127xError<SPI::Error>> {
-        // TODO
-        Ok(())
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO0_MASK, DIO_MAPPING_1_DIO0_SHIFT).await
+    }
+
+    pub async fn set_dio1(&mut self, signal: ContinuousDio1Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO1_MASK, DIO_MAPPING_1_DIO1_SHIFT).await
+    }
+
+    pub async fn set_dio2(&mut self, signal: ContinuousDio2Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO2_MASK, DIO_MAPPING_1_DIO2_SHIFT).await
+    }
+
+    pub async fn set_dio3(&mut self, signal: ContinuousDio3Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO3_MASK, DIO_MAPPING_1_DIO3_SHIFT).await
+    }
+
+    pub async fn set_dio4(&mut self, signal: ContinuousDio4Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_2, signal as u8, DIO_MAPPING_2_DIO4_MASK, DIO_MAPPING_2_DIO4_SHIFT).await
+    }
+
+    pub async fn set_dio5(&mut self, signal: ContinuousDio5Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_2, signal as u8, DIO_MAPPING_2_DIO5_MASK, DIO_MAPPING_2_DIO5_SHIFT).await
     }
 }
 
 impl<SPI: SpiDevice> Sx127xFsk<crate::data_mode::PacketMode, SPI> {
     pub async fn set_dio0(&mut self, signal: PacketDio0Signal) -> Result<(), Sx127xError<SPI::Error>> {
-        // TODO
-        Ok(())
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO0_MASK, DIO_MAPPING_1_DIO0_SHIFT).await
+    }
+
+    pub async fn set_dio1(&mut self, signal: PacketDio1Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO1_MASK, DIO_MAPPING_1_DIO1_SHIFT).await
+    }
+
+    pub async fn set_dio2(&mut self, signal: PacketDio2Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO2_MASK, DIO_MAPPING_1_DIO2_SHIFT).await
+    }
+
+    pub async fn set_dio3(&mut self, signal: PacketDio3Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_1, signal as u8, DIO_MAPPING_1_DIO3_MASK, DIO_MAPPING_1_DIO3_SHIFT).await
+    }
+
+    pub async fn set_dio4(&mut self, signal: PacketDio4Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_2, signal as u8, DIO_MAPPING_2_DIO4_MASK, DIO_MAPPING_2_DIO4_SHIFT).await
+    }
+
+    pub async fn set_dio5(&mut self, signal: PacketDio5Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        self.set_dio(DIO_MAPPING_2, signal as u8, DIO_MAPPING_2_DIO5_MASK, DIO_MAPPING_2_DIO5_SHIFT).await
     }
 }
 
@@ -718,6 +756,12 @@ impl<DM: DataMode, SPI: SpiDevice> Sx127xFsk<DM, SPI> {
         let mut byte = self.spi.read(PACKET_CONFIG_2).await?;
         set_bits(&mut byte, DM::DATA_MODE_BIT, PACKET_CONFIG_2_DATA_MODE_MASK, 6);
         self.spi.write(PACKET_CONFIG_2, byte).await
+    }
+
+    async fn set_dio(&mut self, addr: u8, bits: u8, mask: u8, shift: u8) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(addr).await?;
+        set_bits(&mut byte, bits, mask, shift);
+        self.spi.write(addr, byte).await
     }
 
     // Selects the LoRa modem when `on` == true, and the FSK/OOK modem when `on` == false.
