@@ -1,0 +1,6 @@
+// will be defined within a bound impl of the fsk driver:
+//     // but this wouldn't show up on the driver...
+//     async fn set_dio0(&mut self, signal: PacketDio0Signal) {}
+// }
+// set_dioN cannot be on the trait bc they need to accept data-mode specific dioN signals...
+// async fn set_dio0(&mut self, signal: ContinuousDio0Signal) {}

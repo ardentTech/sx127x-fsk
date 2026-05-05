@@ -1,21 +1,42 @@
+use core::marker::PhantomData;
 use embedded_hal_async::spi::SpiDevice;
 use sx127x_common::bits::{get_bits, set_bits, unset_bits};
 use sx127x_common::error::Sx127xError;
 use sx127x_common::{FSTEP, FXOSC_HZ};
 use sx127x_common::spi::Sx127xSpi;
 use crate::{calculate, validate};
+use crate::data_mode::DataMode;
+use crate::dio::{ContinuousDio0Signal, PacketDio0Signal};
 use crate::registers::*;
 use crate::types::*;
 
 /// Sx127x driver with FSK modem.
-pub struct Sx127xFsk<SPI> {
+pub struct Sx127xFsk<DM, SPI> {
+    data_mode: PhantomData<DM>,
     pub spi: Sx127xSpi<SPI>
 }
-impl<SPI: SpiDevice> Sx127xFsk<SPI> {
+
+impl<SPI: SpiDevice> Sx127xFsk<crate::data_mode::ContinuousMode, SPI> {
+    pub async fn set_dio0(&mut self, signal: ContinuousDio0Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        // TODO
+        Ok(())
+    }
+}
+
+impl<SPI: SpiDevice> Sx127xFsk<crate::data_mode::PacketMode, SPI> {
+    pub async fn set_dio0(&mut self, signal: PacketDio0Signal) -> Result<(), Sx127xError<SPI::Error>> {
+        // TODO
+        Ok(())
+    }
+}
+
+
+impl<DM: DataMode, SPI: SpiDevice> Sx127xFsk<DM, SPI> {
     pub async fn new(spi: SPI) -> Result<Self, Sx127xError<SPI::Error>> {
-        let mut driver = Self { spi: Sx127xSpi::new(spi) };
+        let mut driver = Self { data_mode: PhantomData, spi: Sx127xSpi::new(spi) };
 
         driver.set_fsk_mode().await?;
+        driver.set_data_mode().await?;
 
         Ok(driver)
     }
@@ -112,7 +133,6 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
             crc_auto_clear_off: get_bits(config_1, PACKET_CONFIG_1_CRC_AUTO_CLEAR_OFF_MASK, 3) == 0,
             crc_on: get_bits(config_1, PACKET_CONFIG_1_CRC_ON_MASK, 1) == 1,
             crc_whitening_type: CrcWhiteningType::from(get_bits(config_1, PACKET_CONFIG_1_CRC_WHITENING_TYPE_MASK, 0)),
-            data_mode: DataMode::from(get_bits(config_2, PACKET_CONFIG_2_DATA_MODE_MASK, 6)),
             dc_free: DcFree::from(get_bits(config_1, PACKET_CONFIG_1_DC_FREE_MASK, 5)),
             io_home_on: get_bits(config_2, PACKET_CONFIG_2_IO_HOME_ON_MASK, 3) == 1,
             packet_format: PacketFormat::from(get_bits(config_1, PACKET_CONFIG_1_PACKET_FORMAT_MASK, 7)),
@@ -379,7 +399,7 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
         self.spi.write(PACKET_CONFIG_1, config1).await?;
 
         let mut config2 = 0u8;
-        set_bits(&mut config2, config.data_mode as u8, PACKET_CONFIG_2_DATA_MODE_MASK, 6);
+        //set_bits(&mut config2, config.data_mode as u8, PACKET_CONFIG_2_DATA_MODE_MASK, 6);
         set_bits(&mut config2, config.io_home_on as u8, PACKET_CONFIG_2_IO_HOME_ON_MASK, 5);
         set_bits(&mut config2, config.beacon_on as u8, PACKET_CONFIG_2_BEACON_ON_MASK, 3);
         set_bits(&mut config2, (config.payload_length >> 8) as u8, PACKET_CONFIG_2_PAYLOAD_LENGTH_MASK, 0);
@@ -693,6 +713,12 @@ impl<SPI: SpiDevice> Sx127xFsk<SPI> {
     }
 
     // PRIVATE -------------------------------------------------------------------------------------
+
+    async fn set_data_mode(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
+        let mut byte = self.spi.read(PACKET_CONFIG_2).await?;
+        set_bits(&mut byte, DM::DATA_MODE_BIT, PACKET_CONFIG_2_DATA_MODE_MASK, 6);
+        self.spi.write(PACKET_CONFIG_2, byte).await
+    }
 
     // Selects the LoRa modem when `on` == true, and the FSK/OOK modem when `on` == false.
     async fn set_fsk_mode(&mut self) -> Result<(), Sx127xError<SPI::Error>> {
